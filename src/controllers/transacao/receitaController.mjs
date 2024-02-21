@@ -1,0 +1,50 @@
+import ReceitaModel from "../../models/transacao/receitaModel.mjs";
+
+
+const addReceita = (req, res) => {
+  const { descricao, valor, categoria, status, data, banco } = req.body;
+  console.log(data)
+  const cod_casal = req.header('auth');
+  const usuario = req.header('usuario')
+  ReceitaModel.addReceita(descricao, valor, usuario, cod_casal, categoria, status, data, banco, (err, resultado) => {
+    if (err) {
+      console.error('Erro ao cadastrar receita:', err);
+      return res.status(500).json({ message: 'Erro ao cadastrar receita' });
+    }
+    res.status(200).json({ message: 'Receita cadastrada com sucesso', resultado });
+  });
+};
+
+const readReceita = (req, res) => {
+  const casal = req.header('auth');
+  const usuario = req.header('usuario');
+  const mes = req.header('mes');
+  const ano = req.header('ano');
+
+  ReceitaModel.readReceita(usuario, casal, mes, ano, (err, results) => {
+    if(err) {
+      console.error('Erro ao Encontrar as receitas', err);
+      return res.status(500).json({error: 'Erro ao buscar receitas'});
+    }
+
+    res.status(200).json({message: 'Receitas encontradas', results})
+  })
+}
+
+const deleteReceita = (req, res) => {
+  const casal = req.header('auth');
+  const usuario = req.header('usuario');
+  const id = req.header('id');
+
+  ReceitaModel.deleteReceita(id, usuario, casal, (err, results) => {
+    if(err) {
+      console.error('Erro ao excluir receita', err);
+      return res.status(500).json({message: 'Não foi possível excluir a receita'});
+    }
+
+    res.status(200).json({message: 'Receita excluida com sucesso', results});
+  })
+}
+
+
+export default { addReceita, readReceita, deleteReceita}
