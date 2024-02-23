@@ -18,7 +18,7 @@ app.use('/api/categoriaTr', CategoriaTrRouter) //Gerencia Categorias de Transaç
 app.use('/api/cor', corRouter) //Busca as cores do banco de dados
 app.use('/api/graph', filtrosGraphRouter) //Busca filtros e dados dos gráficos
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8050;
 
 app.listen(PORT, () => {
   console.log(`Servidor Node.js em execução na porta ${PORT}`);
