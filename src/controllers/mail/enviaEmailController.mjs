@@ -2,9 +2,9 @@ import enviaEmailModel from "../../models/mail/enviaEmailModel.mjs";
 
 const enviaEmail = async (req, res) => {
     try{
-        const {destinatiario, assunto, conteudo} = req.body
+        const {destinatario, assunto, conteudo} = req.body
 
-        await enviaEmailModel.enviaEmail(destinatiario, assunto, conteudo, (err, results) => {
+        await enviaEmailModel.enviaEmail(destinatario, assunto, conteudo, (err, results) => {
             if(err) {
                 return res.status(500).json({error: 'Não foi possível enviar o e-mail em questão'});
             }

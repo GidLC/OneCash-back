@@ -6,7 +6,8 @@ const mailHost = "smtp-mail.outlook.com"
 const mailPort = 587
 
 class enviaEmailModel {
-    static enviaEmail = async (destinatiario, assunto, conteudo, callback) => {
+    static enviaEmail = async (destinatario, assunto, conteudo, callback) => {
+        console.log(destinatario)
         try {
             const transpoter = nodemailer.createTransport({
                 host: mailHost,
@@ -19,8 +20,8 @@ class enviaEmailModel {
             })
     
             const options = {
-                from: "teste@onecash.com.br",
-                to: destinatiario,
+                from: adminMail,
+                to: destinatario,
                 subject: assunto,
                 html: conteudo
             }
