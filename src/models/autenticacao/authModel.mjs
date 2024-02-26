@@ -1,20 +1,30 @@
 // produtoModel.js
 import { connection } from "../../config.mjs";
 import * as crypto from 'crypto'
+import enviaEmail from "../../data/enviaEmail/enviaEmail.mjs";
 
 class AuthModel {
 
-  static cadastroUsuario = (nome, email, senha, dt_criacao, callback) => {
+  static cadastroUsuario = (nome, email, senha, email_parceiro, dt_criacao, callback) => {
     const codigoCasal = crypto.randomBytes(4).toString('hex');
     const senhaHash = crypto.createHash('sha256').update(senha).digest('hex');
 
-    const query = 'INSERT INTO usuario (nome, email, senha, casal, dt_criacao) VALUES (?, ?, ?, ?, ?)';
-    connection.query(query, [nome, email, senhaHash, codigoCasal, dt_criacao], (err, results) => {
+    const query = 'INSERT INTO usuario (nome, email, senha, email_parceiro, casal, dt_criacao) VALUES (?, ?, ?, ?, ?, ?)';
+    connection.query(query, [nome, email, senhaHash, email_parceiro, codigoCasal, dt_criacao], async (err, results) => {
       if (err) {
         return callback(err, null);
       }
+      const resEmailPrinc = await enviaEmail(email,
+        "Cadastro no OneCash",
+        `Você acaba de se cadastrar no OneCash, o melhor aplicativo de finanças familiar. O código casal seu e de seu(sua) parceiro(a) é o ${codigoCasal}. 
+          Seu parceiro(a) vai precisar dele para se vincular a você, mas não se preocupe já enviamos pra ele(a) também`);
 
-      return callback(null, results)
+      const resEmailSec = await enviaEmail(email_parceiro,
+        "Cadastro no OneCash",
+          `${nome} acaba de se cadastrar no aplicativo OneCash e te colocou como parceiro dele. 
+          Seu código para se vincular a ele e criar o casal de vocês em nosso aplicativo é ${codigoCasal}.`)
+
+      return callback(null, { results, resEmailPrinc, resEmailSec})
     });
   }
 

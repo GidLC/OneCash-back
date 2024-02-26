@@ -12,7 +12,7 @@ const enviaEmail = async (req, res) => {
             res.status(200).json({message: 'E-mail enviado com sucesso', results})
         })
     } catch (error) {
-
+            res.status(500).json({message: 'Não foi possível enviar o e-mail', results})
     }
 }
 

@@ -2,7 +2,7 @@ import AuthModel from "../../models/autenticacao/authModel.mjs";
 
 
 const loginUsuario = (req, res) => {
-  const {email, senha} = req.body;
+  const { email, senha } = req.body;
   AuthModel.loginUsuario(email, senha, (err, resultado) => {
     if (err) {
       console.error('Erro ao encontrar  usuário:', err);
@@ -13,10 +13,10 @@ const loginUsuario = (req, res) => {
 };
 
 const cadastroUsuario = (req, res) => {
-  const { nome, email, senha,  dt_criacao } = req.body;
+  const { nome, email, senha, email_parceiro, dt_criacao } = req.body;
 
   // Chame o método salvarUsuario do modelo
-  AuthModel.cadastroUsuario(nome, email, senha, dt_criacao, (err, resultado) => {
+  AuthModel.cadastroUsuario(nome, email, senha, email_parceiro, dt_criacao, (err, resultado) => {
     if (err) {
       console.error('Erro ao salvar o usuário:', err);
       return res.status(500).json({ error: 'Erro ao salvar o usuário' });
@@ -39,7 +39,7 @@ const buscaCadastro = (req, res) => {
 
 const vincCadastro = (req, res) => {
   console.log(req.body)
-  const { nome, email, senha, cod_casal, dt_criacao, id_usuario_princ} = req.body;
+  const { nome, email, senha, cod_casal, dt_criacao, id_usuario_princ } = req.body;
 
   AuthModel.vincCadastro(nome, email, senha, cod_casal, dt_criacao, id_usuario_princ, (err, resultado) => {
     if (err) {
