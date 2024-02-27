@@ -21,10 +21,10 @@ class AuthModel {
 
       const resEmailSec = await enviaEmail(email_parceiro,
         "Cadastro no OneCash",
-          `${nome} acaba de se cadastrar no aplicativo OneCash e te colocou como parceiro dele. 
+        `${nome} acaba de se cadastrar no aplicativo OneCash e te colocou como parceiro dele. 
           Seu código para se vincular a ele e criar o casal de vocês em nosso aplicativo é ${codigoCasal}.`)
 
-      return callback(null, { results, resEmailPrinc, resEmailSec})
+      return callback(null, { results, resEmailPrinc, resEmailSec })
     });
   }
 
@@ -89,6 +89,56 @@ class AuthModel {
         console.log(results[0])
         callback(null, results[0]);
       }
+    })
+  }
+
+  static buscaCadastroEmail = async (email, callback) => {
+    console.log(email)
+    const token = crypto.randomBytes(4).toString('hex');
+    const data = new Date()
+    const validade = new Date(data.getTime() + 0 * 60 * 60 * 1000).toISOString();
+    console.log(validade)
+
+    const queryUsuario = `SELECT * FROM usuario WHERE email = ?`;
+    const buscaUsuario = await new Promise((resolve, reject) => {
+      connection.query(queryUsuario, [email], (err, results) => {
+        if (err) {
+          reject(err);
+        } else if (results.length == 0) {
+          resolve(results);
+        }
+        resolve(results)
+      });
+    });
+
+    if (!buscaUsuario[0]) {
+      return callback("Usuário não encontrado", null);
+    }
+
+    const userId = buscaUsuario[0].id
+    const queryToken = "INSERT INTO senha_temp (id_usuario, token, validade) VALUES (?,?,?)";
+    await new Promise((resolve, reject) => {
+      connection.query(queryToken, [userId, token, validade], (err, results) => {
+        if (err) {
+          reject(err);
+        }
+
+        resolve(results);
+      });
+    });
+
+    enviaEmail(email, "Mudança de senha no OneCash", `Para realizar a mudança de sua senha digite o código ${token}`);
+  };
+
+  static mudaSenha = (id, novaSenha, callback) => {
+    const senhaHash = crypto.createHash('sha256').update(novaSenha).digest('hex');
+    const query = 'UPDATE usuario SET senha = ? WHERE id = ?';
+    connection.query(query, [senhaHash, id], (err, results) => {
+      if (err) {
+        return callback(err, null);
+      }
+
+      return callback(null, results)
     })
   }
 

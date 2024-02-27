@@ -6,5 +6,7 @@ authRouter.post('/cadastro', authController.cadastroUsuario)
 authRouter.get('/buscaCadastro/:codigo', authController.buscaCadastro)
 authRouter.put('/vincCadastro', authController.vincCadastro)
 authRouter.post('/login', authController.loginUsuario)
+authRouter.get('/buscaCadEmail', authController.buscaCadastroEmail)
+authRouter.put('/mudaSenha', authController.mudaSenha)
 
 export default authRouter;

@@ -50,5 +50,32 @@ const vincCadastro = (req, res) => {
   });
 };
 
-export default { cadastroUsuario, loginUsuario, buscaCadastro, vincCadastro }
+const buscaCadastroEmail = (req, res) => {
+  const email = req.header('email');
+  console.log(email);
+
+  AuthModel.buscaCadastroEmail(email, (err, results) => {
+    if (err) {
+      console.error('Erro ao encontrar cadastro');
+      return res.status(500).json({ error: 'Erro ao encontrar cadastro' });
+    } else if (!results) {
+      return ({ message: 'Não foi possível encontrar o usuário' })
+    }
+    return res.status(200).json({ message: 'Usuário encontrado', results })
+  })
+}
+
+const mudaSenha = (req, res) => {
+  const {id, novaSenha} = req.body;
+
+  AuthModel.mudaSenha(id, novaSenha, (err, results) => {
+    if (err) {
+      return res.status(500).json({error: 'Erro ao mudar a senha'});
+    }
+
+    return res.status(200).json({message: 'Senha alterada com sucesso', results})
+  })
+}
+
+export default { cadastroUsuario, loginUsuario, buscaCadastro, vincCadastro, buscaCadastroEmail, mudaSenha }
 
