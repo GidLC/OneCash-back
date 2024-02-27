@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 21/02/2024 às 22:47
+-- Tempo de geração: 28/02/2024 às 00:32
 -- Versão do servidor: 10.4.28-MariaDB
 -- Versão do PHP: 8.2.4
 
@@ -220,6 +220,19 @@ INSERT INTO `receita` (`id`, `descricao`, `valor`, `categoria`, `usuario`, `casa
 -- --------------------------------------------------------
 
 --
+-- Estrutura para tabela `senha_temp`
+--
+
+CREATE TABLE `senha_temp` (
+  `id` int(11) NOT NULL,
+  `id_usuario` int(100) NOT NULL,
+  `token` varchar(5) NOT NULL,
+  `validade` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Estrutura para tabela `usuario`
 --
 
@@ -238,7 +251,7 @@ CREATE TABLE `usuario` (
 --
 
 INSERT INTO `usuario` (`id`, `nome`, `email`, `senha`, `casal`, `dt_criacao`, `ultimo_acesso`) VALUES
-(77, 'Gideone', 'gideonilacerda@gmail.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', '1a16dcbc', '2023-12-08 19:44:18', '0000-00-00 00:00:00'),
+(77, 'Gideone', 'gideonilacerda@gmail.com', '35a9e381b1a27567549b5f8a6f783c167ebf809f1c4d6a9e367240484d8ce281', '1a16dcbc', '2023-12-08 19:44:18', '0000-00-00 00:00:00'),
 (78, 'Thamily', 'thamy@gmail.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', '1a16dcbc', '2023-12-08 20:23:10', '0000-00-00 00:00:00'),
 (89, 'Giovani Lacerda', 'giovani@gmail.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'b0c55c99', '2024-01-04 01:09:29', '0000-00-00 00:00:00'),
 (90, 'Carine', 'carine@gmail.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'b0c55c99', '2024-01-04 01:11:18', '0000-00-00 00:00:00'),
@@ -331,6 +344,12 @@ ALTER TABLE `receita`
   ADD KEY `fk_receita_banco` (`banco`);
 
 --
+-- Índices de tabela `senha_temp`
+--
+ALTER TABLE `senha_temp`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Índices de tabela `usuario`
 --
 ALTER TABLE `usuario`
@@ -388,6 +407,12 @@ ALTER TABLE `objetivo`
 --
 ALTER TABLE `receita`
   MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+
+--
+-- AUTO_INCREMENT de tabela `senha_temp`
+--
+ALTER TABLE `senha_temp`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT de tabela `usuario`
