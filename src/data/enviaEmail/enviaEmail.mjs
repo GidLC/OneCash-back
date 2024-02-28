@@ -1,9 +1,5 @@
 import nodemailer from 'nodemailer';
-
-const adminMail = "dionisio_roberval@hotmail.com"
-const adminPass = "Didi@@123"
-const mailHost = "smtp-mail.outlook.com"
-const mailPort = 587
+import { adminMail, adminPass, mailHost, mailPort } from '../emailConfig.mjs';
 
 const enviaEmail = async(destinatario, assunto, conteudo) => {
     try {

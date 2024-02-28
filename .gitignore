@@ -126,4 +126,7 @@ dist
 .yarn/install-state.gz
 .pnp.*
 *env
-enviaEmailModel.mjs
+
+#Arquivos sensíveis
+emailConfig.mjs
+dbConfig.mjs

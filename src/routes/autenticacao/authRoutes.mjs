@@ -8,5 +8,6 @@ authRouter.put('/vincCadastro', authController.vincCadastro)
 authRouter.post('/login', authController.loginUsuario)
 authRouter.get('/buscaCadEmail', authController.buscaCadastroEmail)
 authRouter.put('/mudaSenha', authController.mudaSenha)
+authRouter.get('/validaToken', authController.validaToken)
 
 export default authRouter;

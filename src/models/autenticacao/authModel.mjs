@@ -14,7 +14,7 @@ class AuthModel {
       if (err) {
         return callback(err, null);
       }
-      const resEmailPrinc = await enviaEmail(email,
+      /*const resEmailPrinc = await enviaEmail(email,
         "Cadastro no OneCash",
         `Você acaba de se cadastrar no OneCash, o melhor aplicativo de finanças familiar. O código casal seu e de seu(sua) parceiro(a) é o ${codigoCasal}. 
           Seu parceiro(a) vai precisar dele para se vincular a você, mas não se preocupe já enviamos pra ele(a) também`);
@@ -22,9 +22,9 @@ class AuthModel {
       const resEmailSec = await enviaEmail(email_parceiro,
         "Cadastro no OneCash",
         `${nome} acaba de se cadastrar no aplicativo OneCash e te colocou como parceiro dele. 
-          Seu código para se vincular a ele e criar o casal de vocês em nosso aplicativo é ${codigoCasal}.`)
+          Seu código para se vincular a ele e criar o casal de vocês em nosso aplicativo é ${codigoCasal}.`)*/
 
-      return callback(null, { results, resEmailPrinc, resEmailSec })
+      return callback(null, { results, /*resEmailPrinc, resEmailSec*/ })
     });
   }
 
@@ -94,9 +94,9 @@ class AuthModel {
 
   static buscaCadastroEmail = async (email, callback) => {
     console.log(email)
-    const token = crypto.randomBytes(4).toString('hex');
+    const token = crypto.randomBytes(2).toString('hex');
     const data = new Date()
-    const validade = new Date(data.getTime() + 0 * 60 * 60 * 1000).toISOString();
+    const validade = new Date(data.getTime() + 2 * 60 * 60 * 1000).toISOString();
     console.log(validade)
 
     const queryUsuario = `SELECT * FROM usuario WHERE email = ?`;
@@ -127,8 +127,24 @@ class AuthModel {
       });
     });
 
-    enviaEmail(email, "Mudança de senha no OneCash", `Para realizar a mudança de sua senha digite o código ${token}`);
+    //enviaEmail(email, "Mudança de senha no OneCash", `Para realizar a mudança de sua senha digite o código ${token}`);
+    return callback(null, "Token Gerado")
   };
+
+  static validaToken = (token, callback) => {
+    const data = new Date();
+    const query = 'SELECT * FROM senha_temp WHERE token = ?'
+    connection.query(query, [token], (err, results) => {
+      if (err || results.length == 0) {
+        return callback(err, null)
+      } else if (data >= results[0].validade) {
+        console.log(`Token vencido`)
+        return callback("Token Vencido",null)
+      } else {
+        return callback(null, results)
+      }
+    });
+  }
 
   static mudaSenha = (id, novaSenha, callback) => {
     const senhaHash = crypto.createHash('sha256').update(novaSenha).digest('hex');

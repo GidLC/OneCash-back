@@ -65,6 +65,17 @@ const buscaCadastroEmail = (req, res) => {
   })
 }
 
+const validaToken = (req, res) => {
+  const token = req.header('token');
+
+  AuthModel.validaToken(token, (err, results) => {
+    if (err || results == null) {
+      return res.status(500).json({error: 'Token inválido'});
+    } 
+    return res.status(200).json({message: 'Token validado', results})
+  });
+};
+
 const mudaSenha = (req, res) => {
   const {id, novaSenha} = req.body;
 
@@ -77,5 +88,5 @@ const mudaSenha = (req, res) => {
   })
 }
 
-export default { cadastroUsuario, loginUsuario, buscaCadastro, vincCadastro, buscaCadastroEmail, mudaSenha }
+export default { cadastroUsuario, loginUsuario, buscaCadastro, vincCadastro, buscaCadastroEmail, validaToken, mudaSenha }
 

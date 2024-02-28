@@ -2,14 +2,15 @@ import express from 'express';
 import mysql from 'mysql2';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import { host, user, password, database } from './dbConfig.mjs';
 
 const app = express();
 
 const connection = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'onecash',
+  host: host,
+  user: user,
+  password: password,
+  database: database,
 });
 
 connection.connect((err) => {
