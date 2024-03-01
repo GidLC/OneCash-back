@@ -1,10 +1,10 @@
 import CategoriaTrModel from "../../models/categoria/categoriaTrModel.mjs";
 
 const addCategoriaTr = (req, res) => {
-    const { nome_categoria, tipo_categoria, cor_categoria } = req.body;
+    const { nome, tipo, cor } = req.body;
     const cod_casal = req.header('auth');
 
-    CategoriaTrModel.addCategoriaTr(nome_categoria, tipo_categoria, cor_categoria, cod_casal, (err, results) => {
+    CategoriaTrModel.addCategoriaTr(nome, tipo, cor, cod_casal, (err, results) => {
         if (err) {
             console.error('Erro ao cadastrar categoria', err);
             return res.status(500).json({ error: 'Erro ao cadastrar categoria' });
