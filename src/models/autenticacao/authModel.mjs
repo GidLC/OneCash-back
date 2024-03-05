@@ -141,7 +141,7 @@ class AuthModel {
         console.log(`Token vencido`)
         return callback("Token Vencido", null)
       } else {
-        return callback(null, results)
+        return callback(null, results[0])
       }
     });
   }

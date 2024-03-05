@@ -78,6 +78,7 @@ const validaToken = (req, res) => {
 
 const mudaSenha = (req, res) => {
   const {id, novaSenha} = req.body;
+  console.log(`id: ${id}, nova senha: ${novaSenha}`)
 
   AuthModel.mudaSenha(id, novaSenha, (err, results) => {
     if (err) {
