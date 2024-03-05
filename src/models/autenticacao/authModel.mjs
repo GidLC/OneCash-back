@@ -14,7 +14,7 @@ class AuthModel {
       if (err) {
         return callback(err, null);
       }
-      /*const resEmailPrinc = await enviaEmail(email,
+      const resEmailPrinc = await enviaEmail(email,
         "Cadastro no OneCash",
         `Você acaba de se cadastrar no OneCash, o melhor aplicativo de finanças familiar. O código casal seu e de seu(sua) parceiro(a) é o ${codigoCasal}. 
           Seu parceiro(a) vai precisar dele para se vincular a você, mas não se preocupe já enviamos pra ele(a) também`);
@@ -22,9 +22,9 @@ class AuthModel {
       const resEmailSec = await enviaEmail(email_parceiro,
         "Cadastro no OneCash",
         `${nome} acaba de se cadastrar no aplicativo OneCash e te colocou como parceiro dele. 
-          Seu código para se vincular a ele e criar o casal de vocês em nosso aplicativo é ${codigoCasal}.`)*/
+          Seu código para se vincular a ele e criar o casal de vocês em nosso aplicativo é ${codigoCasal}.`)
 
-      return callback(null, { results, /*resEmailPrinc, resEmailSec*/ })
+      return callback(null, { results, resEmailPrinc, resEmailSec })
     });
   }
 
@@ -42,37 +42,34 @@ class AuthModel {
     });
   }
 
-  static vincCadastro = async (nome, email, senha, cod_casal, dt_criacao, id_usuario_princ) => {
-    try {
-      const senhaHash = crypto.createHash('sha256').update(senha).digest('hex');
-      const queryUsuario = 'INSERT INTO usuario (nome, email, senha, casal, dt_criacao) VALUES (?, ?, ?, ?, ?)';
-      const usuarioResult = await new Promise((resolve, reject) => {
-        connection.query(queryUsuario, [nome, email, senhaHash, cod_casal, dt_criacao], (err, results) => {
-          if (err) {
-            reject(err);
-          }
-          resolve(results);
-        });
+  static vincCadastro = async (nome, email, senha, cod_casal, email_parceiro, dt_criacao, id_usuario_princ, callback) => {
+    const senhaHash = crypto.createHash('sha256').update(senha).digest('hex');
+    const queryUsuario = 'INSERT INTO usuario (nome, email, senha, casal, email_parceiro, dt_criacao) VALUES (?, ?, ?, ?, ?, ?)';
+    const usuarioResult = await new Promise((resolve, reject) => {
+      connection.query(queryUsuario, [nome, email, senhaHash, cod_casal, email_parceiro, dt_criacao], (err, results) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(results);
       });
+    });
 
-      const userId = usuarioResult.insertId;
+    const userId = usuarioResult.insertId;
 
-      const queryCasal = 'INSERT INTO casal (cod_casal, usuario_princ_casal, usuario_sec_casal) VALUES (?, ?, ?)';
-      const casalResult = await new Promise((resolve, reject) => {
-        connection.query(queryCasal, [cod_casal, id_usuario_princ, userId], (err, results) => {
-          if (err) {
-            reject(err);
-          }
-          resolve(results);
-        });
+    const queryCasal = 'INSERT INTO casal (cod_casal, usuario_princ, usuario_sec) VALUES (?, ?, ?)';
+    const casalResult = await new Promise((resolve, reject) => {
+      connection.query(queryCasal, [cod_casal, id_usuario_princ, userId], (err, results) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(results);
       });
+    });
 
-      return casalResult;
+    return callback(null, casalResult);
 
-    } catch (error) {
-      throw new Error('Erro ao vincular usuários');
-    }
   }
+
 
 
 
@@ -80,6 +77,7 @@ class AuthModel {
     const senhaHash = crypto.createHash('sha256').update(senha).digest('hex')
     const query = `SELECT * FROM usuario where email = ? AND senha = ?`;
     connection.query(query, [email, senhaHash], (err, results) => {
+      console.log(results)
       if (err) {
         return callback(err, null);
       } else if (results.length == 0) {
@@ -90,6 +88,8 @@ class AuthModel {
         callback(null, results[0]);
       }
     })
+    //Verificar se há um casal vinculado a esse usuario (se sim login efetuado, se não não efetuar login)
+    //Registrar acesso do usuário
   }
 
   static buscaCadastroEmail = async (email, callback) => {
@@ -127,7 +127,7 @@ class AuthModel {
       });
     });
 
-    //enviaEmail(email, "Mudança de senha no OneCash", `Para realizar a mudança de sua senha digite o código ${token}`);
+    enviaEmail(email, "Mudança de senha no OneCash", `Para realizar a mudança de sua senha digite o código ${token}`);
     return callback(null, "Token Gerado")
   };
 
@@ -139,7 +139,7 @@ class AuthModel {
         return callback(err, null)
       } else if (data >= results[0].validade) {
         console.log(`Token vencido`)
-        return callback("Token Vencido",null)
+        return callback("Token Vencido", null)
       } else {
         return callback(null, results)
       }

@@ -1,10 +1,10 @@
 import CategoriaTrModel from "../../models/categoria/categoriaTrModel.mjs";
 
 const addCategoriaTr = (req, res) => {
-    const { nome_categoria, tipo_categoria, cor_categoria } = req.body;
+    const { nome, tipo, cor } = req.body;
     const cod_casal = req.header('auth');
 
-    CategoriaTrModel.addCategoriaTr(nome_categoria, tipo_categoria, cor_categoria, cod_casal, (err, results) => {
+    CategoriaTrModel.addCategoriaTr(nome, tipo, cor, cod_casal, (err, results) => {
         if (err) {
             console.error('Erro ao cadastrar categoria', err);
             return res.status(500).json({ error: 'Erro ao cadastrar categoria' });
@@ -30,9 +30,9 @@ const loadCategoriaTr = (req, res) => {
 
 const loadCategoriaTrID = (req, res) => {
     const auth = req.header('auth');
-    const { id_categoria } = req.body;
+    const { id } = req.body;
 
-    CategoriaTrModel.loadCategoriaTrID(auth, id_categoria, (err, results) => {
+    CategoriaTrModel.loadCategoriaTrID(auth, id, (err, results) => {
         if (err) {
             console.error('Não foi possível carregar a categoria em questão', err);
             return res.status(500).json({ error: 'Não foi possível carregar a categoria em questão', results })
@@ -44,9 +44,9 @@ const loadCategoriaTrID = (req, res) => {
 
 const editCategoriaTr = (req, res) => {
     const auth = req.header('auth');
-    const {id_categoria, nome_categoria, tipo_categoria, cor_categoria } = req.body;
+    const {id, nome, tipo, cor } = req.body;
 
-    CategoriaTrModel.editCategoriaTr(auth, id_categoria, nome_categoria, tipo_categoria, cor_categoria, (err, results) => {
+    CategoriaTrModel.editCategoriaTr(auth, id, nome, tipo, cor, (err, results) => {
         if (err) {
             console.error('Não foi possível editar essa Categoria', err);
             return res.status(500).json({ error: 'Não foi possível editar essa Categoria', results })
@@ -58,9 +58,9 @@ const editCategoriaTr = (req, res) => {
 
 const deleteCategoriaTr = (req, res) => {
     const auth = req.header('auth');
-    const {id_categoria} = req.body;
+    const {id} = req.body;
 
-    CategoriaTrModel.deleteCategoriaTr(auth, id_categoria, (err, results) => {
+    CategoriaTrModel.deleteCategoriaTr(auth, id, (err, results) => {
         if(err) {
             console.error('Não foi possível exculir essa categoria', err);
             return res.status(500).json({error: 'Não foi possível exculir essa categoria', results})

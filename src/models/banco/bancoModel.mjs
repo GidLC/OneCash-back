@@ -2,15 +2,27 @@ import { connection } from "../../config.mjs";
 
 
 class BancoModel {
-    static addBanco = (saldo_inicial, casal, nome, tipo, callback) => {
-        const query = 'INSERT INTO banco (nome, tipo, saldo_inicial, casal) VALUES (?,?,?,?)';
-        connection.query(query, [nome, tipo, saldo_inicial, casal], (err, results) => {
-            if (err) {
-                return callback(err, null)
-            }
+    static addBanco = (saldo_inicial, casal, nome, tipo, usuario, callback) => {
+        if (tipo == 1) {
+            const query = 'INSERT INTO banco (nome, tipo, saldo_inicial, casal, usuario) VALUES (?,?,?,?,?)';
+            connection.query(query, [nome, tipo, saldo_inicial, casal, usuario], (err, results) => {
+                if (err) {
+                    return callback(err, null)
+                }
 
-            return callback(null, results)
-        })
+                return callback(null, results)
+            })
+        } else {
+            const query = 'INSERT INTO banco (nome, tipo, saldo_inicial, casal) VALUES (?,?,?,?)';
+            connection.query(query, [nome, tipo, saldo_inicial, casal], (err, results) => {
+                if (err) {
+                    return callback(err, null)
+                }
+
+                return callback(null, results)
+            })
+        }
+
     }
 
     static readBanco = (cod_casal, callback) => {
