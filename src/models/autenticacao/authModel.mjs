@@ -73,21 +73,39 @@ class AuthModel {
 
 
 
-  static loginUsuario = (email, senha, callback) => {
+  static loginUsuario = async (email, senha, callback) => {
     const senhaHash = crypto.createHash('sha256').update(senha).digest('hex')
-    const query = `SELECT * FROM usuario where email = ? AND senha = ?`;
-    connection.query(query, [email, senhaHash], (err, results) => {
-      console.log(results)
-      if (err) {
-        return callback(err, null);
-      } else if (results.length == 0) {
-        err = `Usuário não encontrado na base de dados`;
-        return callback(err, null)
-      } else {
-        console.log(results[0])
-        callback(null, results[0]);
-      }
+
+
+    const queryLogin = `SELECT * FROM usuario where email = ? AND senha = ?`;
+    const login = await new Promise((resolve, reject) => {
+      connection.query(queryLogin, [email, senhaHash], (err, results) => {
+        console.log(results)
+        if (err) {
+          reject(err)
+        } else if (results.length == 0) {
+          err = `Usuário não encontrado`
+          return callback(err, null)
+        } else {
+          console.log(results[0])
+          resolve(results)
+        }
+      })
     })
+    
+    const queryCasal = `SELECT * FROM casal WHERE usuario_princ = ? OR usuario_sec = ?`;
+    const casal = await new Promise((resolve, reject) => {
+      connection.query(queryCasal, [login[0].id, login[0].id], (err, results) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(results)
+        }
+      })
+    })
+
+   
+
     //Verificar se há um casal vinculado a esse usuario (se sim login efetuado, se não não efetuar login)
     //Registrar acesso do usuário
   }
