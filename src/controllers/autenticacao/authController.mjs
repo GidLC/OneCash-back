@@ -44,7 +44,7 @@ const vincCadastro = (req, res) => {
   AuthModel.vincCadastro(nome, email, senha, cod_casal, email_parceiro, dt_criacao, id_usuario_princ, (err, resultado) => {
     if (err) {
       console.error('Erro ao vincular usuário :', err);
-      return res.status(500).json({ error: 'Erro ao vincular usuário' });
+      return res.status(500).json({ error: err });
     }
     res.status(200).json({ message: 'Usuário vinculado com sucesso', resultado });
   });

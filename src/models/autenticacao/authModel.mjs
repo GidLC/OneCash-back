@@ -14,17 +14,17 @@ class AuthModel {
       if (err) {
         return callback(err, null);
       }
-      const resEmailPrinc = await enviaEmail(email,
+      /*await enviaEmail(email,
         "Cadastro no OneCash",
         `Você acaba de se cadastrar no OneCash, o melhor aplicativo de finanças familiar. O código casal seu e de seu(sua) parceiro(a) é o ${codigoCasal}. 
           Seu parceiro(a) vai precisar dele para se vincular a você, mas não se preocupe já enviamos pra ele(a) também`);
 
-      const resEmailSec = await enviaEmail(email_parceiro,
+      await enviaEmail(email_parceiro,
         "Cadastro no OneCash",
         `${nome} acaba de se cadastrar no aplicativo OneCash e te colocou como parceiro dele. 
-          Seu código para se vincular a ele e criar o casal de vocês em nosso aplicativo é ${codigoCasal}.`)
+          Seu código para se vincular a ele e criar o casal de vocês em nosso aplicativo é ${codigoCasal}.`)*/
 
-      return callback(null, { results, resEmailPrinc, resEmailSec })
+      return callback(null, { results })
     });
   }
 
@@ -44,6 +44,23 @@ class AuthModel {
 
   static vincCadastro = async (nome, email, senha, cod_casal, email_parceiro, dt_criacao, id_usuario_princ, callback) => {
     const senhaHash = crypto.createHash('sha256').update(senha).digest('hex');
+
+    //verificar se o email a ser vinculado é o mesmo que está cadastrado no usuário principal
+    const queryParceiro = 'SELECT * FROM usuario WHERE email_parceiro = ?'
+    await new Promise((resolve, reject) => {
+      connection.query(queryParceiro, [email], (err, results) => {
+        if (err) {
+          reject(err)
+        } else if (results.length == 0) {
+          err = `Confirme com seu parceiro se ele colocou esse como seu e-mail`
+          return callback(err, null)
+        } else {
+          resolve(results)
+        }
+      })
+    })
+
+    //Insere usuário na tabela
     const queryUsuario = 'INSERT INTO usuario (nome, email, senha, casal, email_parceiro, dt_criacao) VALUES (?, ?, ?, ?, ?, ?)';
     const usuarioResult = await new Promise((resolve, reject) => {
       connection.query(queryUsuario, [nome, email, senhaHash, cod_casal, email_parceiro, dt_criacao], (err, results) => {
@@ -56,6 +73,7 @@ class AuthModel {
 
     const userId = usuarioResult.insertId;
 
+    //Cria linha na tabela de casal
     const queryCasal = 'INSERT INTO casal (cod_casal, usuario_princ, usuario_sec) VALUES (?, ?, ?)';
     const casalResult = await new Promise((resolve, reject) => {
       connection.query(queryCasal, [cod_casal, id_usuario_princ, userId], (err, results) => {
@@ -67,7 +85,6 @@ class AuthModel {
     });
 
     return callback(null, casalResult);
-
   }
 
 
@@ -75,27 +92,44 @@ class AuthModel {
 
   static loginUsuario = async (email, senha, callback) => {
     const senhaHash = crypto.createHash('sha256').update(senha).digest('hex')
+    const data = new Date()
+    const hoje = data.toISOString()
+    console.log(hoje)
 
-
+    //Verifica a existência do usuário
     const queryLogin = `SELECT * FROM usuario where email = ? AND senha = ?`;
     const login = await new Promise((resolve, reject) => {
       connection.query(queryLogin, [email, senhaHash], (err, results) => {
-        console.log(results)
         if (err) {
           reject(err)
         } else if (results.length == 0) {
           err = `Usuário não encontrado`
           return callback(err, null)
         } else {
-          console.log(results[0])
           resolve(results)
         }
       })
     })
-    
+
+    //Verifica a existência de uma casal vinculado ao usuário
     const queryCasal = `SELECT * FROM casal WHERE usuario_princ = ? OR usuario_sec = ?`;
     const casal = await new Promise((resolve, reject) => {
       connection.query(queryCasal, [login[0].id, login[0].id], (err, results) => {
+        if (err) {
+          reject(err)
+        } else if (results.length == 0) {
+          err = `Você e seu parceiro não formaram um casal em nosso app`;
+          return callback(err, null)
+        } else {
+          resolve(results)
+        }
+      })
+    })
+
+    //registra login do usuário
+    const queryDataLogin = 'UPDATE usuario SET ultimo_acesso = ? WHERE id = ?';
+    await new Promise((resolve, reject) => {
+      connection.query(queryDataLogin, [hoje, login[0].id], (err, results) => {
         if (err) {
           reject(err)
         } else {
@@ -104,10 +138,52 @@ class AuthModel {
       })
     })
 
-   
+    if (login[0].id == casal[0].usuario_princ) {
+      const id_parceiro = casal[0].usuario_sec
+      const queryParceiro = `SELECT * FROM usuario where id = ?`;
+      const parceiro = await new Promise((resolve, reject) => {
+        connection.query(queryParceiro, [id_parceiro], (err, results) => {
+          if (err) {
+            reject(err)
+          } else {
+            resolve(results)
+          }
+        })
+      });
 
-    //Verificar se há um casal vinculado a esse usuario (se sim login efetuado, se não não efetuar login)
-    //Registrar acesso do usuário
+      return callback(null, {
+        id: login[0].id,
+        nome: login[0].nome,
+        email: login[0].email,
+        email_parceiro: login[0].email_parceiro,
+        cod_casal: casal[0].cod_casal,
+        id_parceiro: id_parceiro,
+        nome_parceiro: parceiro[0].nome
+      })
+    } else {
+      const id_parceiro = casal[0].usuario_princ
+      const queryParceiro = `SELECT * FROM usuario where id = ?`;
+      const parceiro = await new Promise((resolve, reject) => {
+        connection.query(queryParceiro, [id_parceiro], (err, results) => {
+          if (err) {
+            reject(err)
+          } else {
+            resolve(results)
+          }
+        })
+      });
+
+      return callback(null, {
+        id: login[0].id,
+        nome: login[0].nome,
+        email: login[0].email,
+        email_parceiro: login[0].email_parceiro,
+        cod_casal: casal[0].cod_casal,
+        id_parceiro: id_parceiro,
+        nome_parceiro: parceiro[0].nome
+      })
+    }
+
   }
 
   static buscaCadastroEmail = async (email, callback) => {
@@ -145,7 +221,7 @@ class AuthModel {
       });
     });
 
-    enviaEmail(email, "Mudança de senha no OneCash", `Para realizar a mudança de sua senha digite o código ${token}`);
+    //enviaEmail(email, "Mudança de senha no OneCash", `Para realizar a mudança de sua senha digite o código ${token}`);
     return callback(null, "Token Gerado")
   };
 
@@ -177,5 +253,7 @@ class AuthModel {
   }
 
 }
+
+//Criar lógica para excluir dados do BD
 
 export default AuthModel;

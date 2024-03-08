@@ -3,7 +3,7 @@ import { app } from './config.mjs';
 import authRouter from './routes/autenticacao/authRoutes.mjs';
 import bancoRouter from './routes/banco/bancoRoutes.mjs';
 import CategoriaTrRouter from './routes/categoria/CategoriaTrRoutes.mjs';
-import corRouter from './routes/cor/corRoutes.mjs';
+import frontRouter from './routes/front/frontRoutes.mjs';
 import filtrosGraphRouter from './routes/filtros/filtrosGraphRoute.mjs';
 import enviaEmailRouter from './routes/mail/enviaEmailRoutes.mjs';
 import compraRouter from './routes/transacao/compraRoutes.mjs';
@@ -16,7 +16,7 @@ app.use('/api/despesaCol', despesaColRouter) //Gerencia despesa coletiva
 app.use('/api/compra', compraRouter) //Gerencia compras nos supermercados
 app.use('/api/banco', bancoRouter) //Gerencia Contas Bancárias
 app.use('/api/categoriaTr', CategoriaTrRouter) //Gerencia Categorias de Transações
-app.use('/api/cor', corRouter) //Busca as cores do banco de dados
+app.use('/api/front', frontRouter) //Busca as cores do banco de dados
 app.use('/api/graph', filtrosGraphRouter) //Busca filtros e dados dos gráficos
 app.use('/api/email', enviaEmailRouter) //Envia emails
 

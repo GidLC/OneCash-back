@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 06-Mar-2024 às 00:40
+-- Tempo de geração: 08-Mar-2024 às 01:49
 -- Versão do servidor: 10.4.27-MariaDB
 -- versão do PHP: 8.2.0
 
@@ -42,8 +42,7 @@ CREATE TABLE `banco` (
 
 INSERT INTO `banco` (`id`, `nome`, `tipo`, `saldo_inicial`, `casal`, `usuario`) VALUES
 (16, 'Bradesco', 2, 5000, '74665ecf', 0),
-(17, 'Banco do Brasil', 1, 1500.75, '74665ecf', 133),
-(18, 'Banco do Brasil', 2, 1500.75, '74665ecf', 0);
+(17, 'Banco do Brasil', 1, 1500.75, '74665ecf', 133);
 
 -- --------------------------------------------------------
 
@@ -63,7 +62,8 @@ CREATE TABLE `casal` (
 --
 
 INSERT INTO `casal` (`id`, `cod_casal`, `usuario_princ`, `usuario_sec`) VALUES
-(32, '74665ecf', 133, 134);
+(32, '74665ecf', 133, 134),
+(33, '237feb85', 137, 138);
 
 -- --------------------------------------------------------
 
@@ -76,18 +76,9 @@ CREATE TABLE `categoria_tr` (
   `nome` varchar(100) NOT NULL,
   `tipo` tinyint(1) NOT NULL COMMENT '0: despesa\r\n1: receita',
   `cor` int(11) NOT NULL,
+  `icone` int(11) NOT NULL,
   `casal` varchar(15) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Extraindo dados da tabela `categoria_tr`
---
-
-INSERT INTO `categoria_tr` (`id`, `nome`, `tipo`, `cor`, `casal`) VALUES
-(9, 'Casa', 0, 2, '74665ecf'),
-(10, 'Salário', 1, 3, '74665ecf'),
-(11, 'Vale Alimentação', 1, 5, '74665ecf'),
-(12, 'Luz', 0, 4, '74665ecf');
 
 -- --------------------------------------------------------
 
@@ -138,7 +129,7 @@ CREATE TABLE `despesa_col` (
   `id` int(11) NOT NULL,
   `descricao` varchar(100) NOT NULL,
   `valor` float NOT NULL,
-  `status` tinyint(1) NOT NULL,
+  `status` tinyint(1) NOT NULL COMMENT '0: pendente\r\n1: recebida',
   `casal` varchar(10) NOT NULL,
   `dia` int(11) NOT NULL,
   `mes` int(2) NOT NULL,
@@ -149,13 +140,6 @@ CREATE TABLE `despesa_col` (
   `banco` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Extraindo dados da tabela `despesa_col`
---
-
-INSERT INTO `despesa_col` (`id`, `descricao`, `valor`, `status`, `casal`, `dia`, `mes`, `ano`, `categoria`, `tipo`, `compra`, `banco`) VALUES
-(11, 'Chuveiro ', 60, 1, '74665ecf', 5, 2, 2024, 9, 0, 0, 16);
-
 -- --------------------------------------------------------
 
 --
@@ -165,8 +149,53 @@ INSERT INTO `despesa_col` (`id`, `descricao`, `valor`, `status`, `casal`, `dia`,
 CREATE TABLE `icones` (
   `id` int(11) NOT NULL,
   `nome` varchar(50) NOT NULL,
-  `Ion_nome` varchar(50) NOT NULL
+  `ion_nome` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Extraindo dados da tabela `icones`
+--
+
+INSERT INTO `icones` (`id`, `nome`, `ion_nome`) VALUES
+(1, 'aviao', 'airplaneOutline'),
+(2, 'bola', 'americanFootballOutline'),
+(3, 'grafico', 'analyticsOutline'),
+(4, 'mala', 'bagHandleOutline'),
+(5, 'grafBar', 'barChartOutline'),
+(6, 'barraAcad', 'barbellOutline'),
+(7, 'codBarras', 'barcodeOutline'),
+(8, 'cama', 'bedOutline'),
+(9, 'cerveja', 'beerOutline'),
+(10, 'bicicleta', 'bicycleOutline'),
+(11, 'livro', 'bookOutline'),
+(12, 'malaWork', 'briefcaseOutline'),
+(13, 'ferramenta', 'buildOutline'),
+(14, 'onibus', 'busOutline'),
+(15, 'telefone', 'callOutline'),
+(16, 'carro', 'carOutline'),
+(17, 'cartao', 'cardOutline'),
+(18, 'marteloChave', 'constructOutline'),
+(19, 'tesoura', 'cutOutline'),
+(20, 'tela', 'desktopOutline'),
+(21, 'comida', 'fastFoodOutline'),
+(22, 'filme', 'filmOutline'),
+(23, 'coracaoFit', 'fitnessOutline'),
+(24, 'flash', 'flashOutline'),
+(25, 'game', 'gameControllerOutline'),
+(26, 'presente', 'giftOutline'),
+(27, 'casa', 'homeOutline'),
+(28, 'sorvete', 'iceCreamOutline'),
+(29, 'kitMedico', 'medkitOutline'),
+(30, 'musica', 'musicalNoteOutline'),
+(31, 'colherFaca', 'restaurantOutline'),
+(32, 'escola', 'schoolOutline'),
+(33, 'camiseta', 'shirtOutline'),
+(34, 'cinema', 'ticketOutline'),
+(35, 'sombrinha', 'umbrellaOutline'),
+(36, 'setaBaixo', 'trendingDownOutline'),
+(37, 'setaCima', 'trendingUpOutline'),
+(38, 'carteira', 'walletOutline'),
+(39, 'wifi', 'wifiOutline');
 
 -- --------------------------------------------------------
 
@@ -210,7 +239,8 @@ CREATE TABLE `receita` (
   `categoria` int(11) NOT NULL,
   `usuario` int(11) NOT NULL,
   `casal` varchar(8) NOT NULL,
-  `status` tinyint(1) NOT NULL,
+  `status` tinyint(1) NOT NULL COMMENT '0: pendente\r\n1: recebida',
+  `tipo` int(2) NOT NULL COMMENT '1: individual\r\n2: coletiva',
   `dia` int(2) NOT NULL,
   `mes` int(2) NOT NULL,
   `ano` int(4) NOT NULL,
@@ -229,14 +259,6 @@ CREATE TABLE `senha_temp` (
   `token` varchar(10) NOT NULL,
   `validade` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Extraindo dados da tabela `senha_temp`
---
-
-INSERT INTO `senha_temp` (`id`, `id_usuario`, `token`, `validade`) VALUES
-(24, 128, '701f', '2024-03-01 12:59:50'),
-(25, 130, '7d16', '2024-03-05 18:06:25');
 
 -- --------------------------------------------------------
 
@@ -260,8 +282,10 @@ CREATE TABLE `usuario` (
 --
 
 INSERT INTO `usuario` (`id`, `nome`, `email`, `senha`, `casal`, `email_parceiro`, `dt_criacao`, `ultimo_acesso`) VALUES
-(133, 'Gideone', 'gideonilacerda@gmail.com', '221b37fcdb52d0f7c39bbd0be211db0e1c00ca5fbecd5788780463026c6b964b', '74665ecf', 'gideonilc@hotmail.com', '2024-03-05 16:10:29', '0000-00-00 00:00:00'),
-(134, 'Thamy', 'gideonilc@hotmail.com', '221b37fcdb52d0f7c39bbd0be211db0e1c00ca5fbecd5788780463026c6b964b', '74665ecf', '', '2024-03-05 16:12:37', '0000-00-00 00:00:00');
+(133, 'Gideone', 'gideonilacerda@gmail.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', '74665ecf', 'gideonilc@hotmail.com', '2024-03-05 16:10:29', '2024-03-07 21:37:59'),
+(134, 'Thamy', 'gideonilc@hotmail.com', '221b37fcdb52d0f7c39bbd0be211db0e1c00ca5fbecd5788780463026c6b964b', '74665ecf', '', '2024-03-05 16:12:37', '0000-00-00 00:00:00'),
+(137, 'Gideone 2', 'gideonelacerda@hotmail.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', '237feb85', 'thamy@email.com', '2024-02-26 11:37:00', '2024-03-07 17:31:37'),
+(138, 'Thamilly', 'thamy@email.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', '237feb85', 'gideonilacerda@hotmail.com', '2024-03-07 16:22:55', '2024-03-07 14:43:08');
 
 --
 -- Índices para tabelas despejadas
@@ -289,7 +313,8 @@ ALTER TABLE `casal`
 ALTER TABLE `categoria_tr`
   ADD PRIMARY KEY (`id`),
   ADD KEY `fk_categoria_tr_cor` (`cor`),
-  ADD KEY `fk_categoria_tr_casal` (`casal`);
+  ADD KEY `fk_categoria_tr_casal` (`casal`),
+  ADD KEY `fk_categoria_tr_icone` (`icone`);
 
 --
 -- Índices para tabela `cor`
@@ -363,13 +388,13 @@ ALTER TABLE `banco`
 -- AUTO_INCREMENT de tabela `casal`
 --
 ALTER TABLE `casal`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- AUTO_INCREMENT de tabela `categoria_tr`
 --
 ALTER TABLE `categoria_tr`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT de tabela `cor`
@@ -381,13 +406,13 @@ ALTER TABLE `cor`
 -- AUTO_INCREMENT de tabela `despesa_col`
 --
 ALTER TABLE `despesa_col`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT de tabela `icones`
 --
 ALTER TABLE `icones`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- AUTO_INCREMENT de tabela `log`
@@ -405,19 +430,19 @@ ALTER TABLE `objetivo`
 -- AUTO_INCREMENT de tabela `receita`
 --
 ALTER TABLE `receita`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- AUTO_INCREMENT de tabela `senha_temp`
 --
 ALTER TABLE `senha_temp`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT de tabela `usuario`
 --
 ALTER TABLE `usuario`
-  MODIFY `id` int(254) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=135;
+  MODIFY `id` int(254) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=139;
 
 --
 -- Restrições para despejos de tabelas
@@ -441,7 +466,8 @@ ALTER TABLE `casal`
 --
 ALTER TABLE `categoria_tr`
   ADD CONSTRAINT `fk_categoria_tr_casal` FOREIGN KEY (`casal`) REFERENCES `casal` (`cod_casal`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_categoria_tr_cor` FOREIGN KEY (`cor`) REFERENCES `cor` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_categoria_tr_cor` FOREIGN KEY (`cor`) REFERENCES `cor` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_categoria_tr_icone` FOREIGN KEY (`icone`) REFERENCES `icones` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Limitadores para a tabela `despesa_col`
