@@ -10,6 +10,18 @@ const buscaCores = (req, res) => {
     });
 };
 
+const buscaCorID = (req, res) => {
+    const {id} = req.body;
+
+    frontModel.buscaCorID(id, (err, results) => {
+        if (err) {
+            console.error('Não foi possível essa cor', err);
+            return res.status(500).json({ error: 'Não foi possível essa cor' });
+        }
+        res.status(200).json({ message: 'Cor encontrada com sucesso', results })
+    })
+}
+
 const buscaIcones = (req, res) => {
     frontModel.buscaIcones((err, results) => {
         if (err) {
@@ -20,4 +32,15 @@ const buscaIcones = (req, res) => {
     })
 }
 
-export default { buscaCores, buscaIcones }
+const buscaIconeID = (req, res) => {
+    const {id} = req.body
+    frontModel.buscaIconeID(id, (err, results) => {
+        if (err) {
+            console.error('Não foi possível encontrar o ícone', err);
+            return res.status(500).json({ error: 'Não foi possível encontrar o ícone' });
+        }
+        res.status(200).json({ message: 'Icone encontrado com sucesso', results })
+    })
+}
+
+export default { buscaCores, buscaIcones, buscaCorID, buscaIconeID }

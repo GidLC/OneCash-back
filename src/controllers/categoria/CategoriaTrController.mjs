@@ -1,10 +1,10 @@
 import CategoriaTrModel from "../../models/categoria/categoriaTrModel.mjs";
 
 const addCategoriaTr = (req, res) => {
-    const { nome, tipo, cor } = req.body;
+    const { nome, tipo, cor, icone } = req.body;
     const cod_casal = req.header('auth');
 
-    CategoriaTrModel.addCategoriaTr(nome, tipo, cor, cod_casal, (err, results) => {
+    CategoriaTrModel.addCategoriaTr(nome, tipo, cor, icone, cod_casal, (err, results) => {
         if (err) {
             console.error('Erro ao cadastrar categoria', err);
             return res.status(500).json({ error: 'Erro ao cadastrar categoria' });
@@ -44,9 +44,9 @@ const loadCategoriaTrID = (req, res) => {
 
 const editCategoriaTr = (req, res) => {
     const auth = req.header('auth');
-    const {id, nome, tipo, cor } = req.body;
+    const {id, nome, icone, cor } = req.body;
 
-    CategoriaTrModel.editCategoriaTr(auth, id, nome, tipo, cor, (err, results) => {
+    CategoriaTrModel.editCategoriaTr(auth, id, nome, icone, cor, (err, results) => {
         if (err) {
             console.error('Não foi possível editar essa Categoria', err);
             return res.status(500).json({ error: 'Não foi possível editar essa Categoria', results })
@@ -58,7 +58,8 @@ const editCategoriaTr = (req, res) => {
 
 const deleteCategoriaTr = (req, res) => {
     const auth = req.header('auth');
-    const {id} = req.body;
+    const id = req.header('id');
+    console.log(id)
 
     CategoriaTrModel.deleteCategoriaTr(auth, id, (err, results) => {
         if(err) {
