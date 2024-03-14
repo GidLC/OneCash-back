@@ -5,6 +5,7 @@ import receitaController from '../../controllers/transacao/receitaController.mjs
 receitaRouter.post('/addReceita', receitaController.addReceita)
 receitaRouter.get('/readReceita', receitaController.readReceita)
 receitaRouter.delete('/deleteReceita', receitaController.deleteReceita)
-//receitaRouter.get('/listarReceitas', receitaController)
+receitaRouter.get('/readReceitaID', receitaController.readReceitaID)
+receitaRouter.put('/editReceita', receitaController.editReceita)
 
 export default receitaRouter

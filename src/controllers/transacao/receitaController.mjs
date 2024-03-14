@@ -22,12 +22,42 @@ const readReceita = (req, res) => {
   const ano = req.header('ano');
 
   ReceitaModel.readReceita(usuario, casal, mes, ano, (err, results) => {
-    if(err) {
+    if (err) {
       console.error('Erro ao Encontrar as receitas', err);
-      return res.status(500).json({error: 'Erro ao buscar receitas'});
+      return res.status(500).json({ error: 'Erro ao buscar receitas' });
     }
 
-    res.status(200).json({message: 'Receitas encontradas', results})
+    res.status(200).json({ message: 'Receitas encontradas', results })
+  })
+}
+
+const readReceitaID = (req, res) => {
+  const id = req.header('id');
+  const casal = req.header('auth');
+  const usuario = req.header('usuario');
+
+  ReceitaModel.readReceitaID(id, usuario, casal, (err, results) => {
+    if (err) {
+      console.error('Erro ao Encontrar a receita', err);
+      return res.status(500).json({ error: 'Erro ao buscar a receita' });
+    }
+
+    res.status(200).json({ message: 'Receita encontrada', results })
+  })
+}
+
+const editReceita = (req, res) => {
+  const casal = req.header('auth');
+  const usuario = req.header('usuario');
+  const {id, descricao, categoria, valor, dia, mes, ano} = req.body
+
+  ReceitaModel.editReceita(casal, usuario, id, descricao, categoria, valor, dia, mes, ano, (err, results) => {
+    if (err) {
+      console.error('Erro ao editar a receita', err);
+      return res.status(500).json({ error: 'Erro ao editar a receita' });
+    }
+
+    res.status(200).json({ message: 'Receita editada com sucesso', results })
   })
 }
 
@@ -37,14 +67,14 @@ const deleteReceita = (req, res) => {
   const id = req.header('id');
 
   ReceitaModel.deleteReceita(id, usuario, casal, (err, results) => {
-    if(err) {
+    if (err) {
       console.error('Erro ao excluir receita', err);
-      return res.status(500).json({message: 'Não foi possível excluir a receita'});
+      return res.status(500).json({ message: 'Não foi possível excluir a receita' });
     }
 
-    res.status(200).json({message: 'Receita excluida com sucesso', results});
+    res.status(200).json({ message: 'Receita excluida com sucesso', results });
   })
 }
 
 
-export default { addReceita, readReceita, deleteReceita}
+export default { addReceita, readReceita, deleteReceita, readReceitaID, editReceita }

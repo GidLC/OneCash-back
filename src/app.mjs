@@ -7,12 +7,12 @@ import frontRouter from './routes/front/frontRoutes.mjs';
 import filtrosGraphRouter from './routes/filtros/filtrosGraphRoute.mjs';
 import enviaEmailRouter from './routes/mail/enviaEmailRoutes.mjs';
 import compraRouter from './routes/transacao/compraRoutes.mjs';
-import despesaColRouter from './routes/transacao/despesaRoutes.mjs';
+import despesaRouter from './routes/transacao/despesaRoutes.mjs';
 import receitaRouter from './routes/transacao/receitaRoutes.mjs';
 
 app.use('/api/auth', authRouter) //autenticação (login, vinculação e cadastro)
 app.use('/api/receita', receitaRouter) // gerencia receita
-app.use('/api/despesaCol', despesaColRouter) //Gerencia despesa coletiva
+app.use('/api/despesa', despesaRouter) //Gerencia despesa coletiva
 app.use('/api/compra', compraRouter) //Gerencia compras nos supermercados
 app.use('/api/banco', bancoRouter) //Gerencia Contas Bancárias
 app.use('/api/categoriaTr', CategoriaTrRouter) //Gerencia Categorias de Transações

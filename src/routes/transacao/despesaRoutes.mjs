@@ -1,8 +1,11 @@
 import express from 'express';
-const despesaColRouter = express.Router();
-import despesaColController from '../../controllers/transacao/despesaColController.mjs';
+const despesaRouter = express.Router();
+import despesaController from '../../controllers/transacao/despesaController.mjs';
 
-despesaColRouter.post('/addDespesaCol', despesaColController.addDespesaCol)
-despesaColRouter.get('/readDespesaCol', despesaColController.readDespesaCol)
+despesaRouter.post('/addDespesa', despesaController.addDespesa)
+despesaRouter.get('/readDespesa', despesaController.readDespesa)
+despesaRouter.get('/readDespesaID', despesaController.readDespesaID)
+despesaRouter.delete('/deleteDespesa', despesaController.deleteDespesa)
+despesaRouter.put('/editDespesa', despesaController.editDespesa)
 
-export default despesaColRouter
+export default despesaRouter
