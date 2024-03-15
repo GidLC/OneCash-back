@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 11-Mar-2024 às 23:28
+-- Tempo de geração: 15-Mar-2024 às 01:47
 -- Versão do servidor: 10.4.32-MariaDB
--- versão do PHP: 8.2.12
+-- versão do PHP: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -87,12 +87,11 @@ CREATE TABLE `categoria_tr` (
 INSERT INTO `categoria_tr` (`id`, `nome`, `tipo`, `cor`, `icone`, `casal`) VALUES
 (18, 'Dinheiro', 1, 3, 12, '74665ecf'),
 (24, 'Salário', 1, 4, 37, '74665ecf'),
-(29, 'Alimentação', 0, 3, 21, '74665ecf'),
-(30, 'Energia ', 0, 5, 24, '74665ecf'),
-(31, 'Supermercado', 0, 2, 34, '74665ecf'),
+(29, 'Comida', 0, 3, 21, '74665ecf'),
+(30, 'Energia ', 0, 3, 24, '74665ecf'),
+(31, 'sa', 0, 2, 36, '74665ecf'),
 (32, 'Vale Alimentação', 1, 6, 31, '74665ecf'),
-(35, 'Prejuizo', 0, 2, 36, '74665ecf'),
-(38, 'Locomoção', 0, 3, 16, '74665ecf');
+(42, 'Presente ', 1, 10, 26, '74665ecf');
 
 -- --------------------------------------------------------
 
@@ -136,15 +135,16 @@ INSERT INTO `cor` (`id`, `nome`, `codigo`) VALUES
 -- --------------------------------------------------------
 
 --
--- Estrutura da tabela `despesa_col`
+-- Estrutura da tabela `despesa`
 --
 
-CREATE TABLE `despesa_col` (
+CREATE TABLE `despesa` (
   `id` int(11) NOT NULL,
   `descricao` varchar(100) NOT NULL,
   `valor` float NOT NULL,
   `status` tinyint(1) NOT NULL COMMENT '0: pendente\r\n1: recebida',
   `casal` varchar(10) NOT NULL,
+  `usuario` int(50) NOT NULL,
   `dia` int(11) NOT NULL,
   `mes` int(2) NOT NULL,
   `ano` int(4) NOT NULL,
@@ -153,6 +153,14 @@ CREATE TABLE `despesa_col` (
   `compra` int(11) NOT NULL,
   `banco` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Extraindo dados da tabela `despesa`
+--
+
+INSERT INTO `despesa` (`id`, `descricao`, `valor`, `status`, `casal`, `usuario`, `dia`, `mes`, `ano`, `categoria`, `tipo`, `compra`, `banco`) VALUES
+(15, 'Editado', 250.69, 0, '74665ecf', 0, 14, 2, 2024, 31, 0, 0, 16),
+(16, 'Aluguel', 500, 0, '74665ecf', 0, 14, 2, 2024, 29, 0, 0, 16);
 
 -- --------------------------------------------------------
 
@@ -266,7 +274,11 @@ CREATE TABLE `receita` (
 --
 
 INSERT INTO `receita` (`id`, `descricao`, `valor`, `categoria`, `usuario`, `casal`, `status`, `tipo`, `dia`, `mes`, `ano`, `banco`) VALUES
-(39, 'Dinheiro ', 5000, 24, 133, '74665ecf', 1, 0, 11, 2, 2024, 17);
+(65, 'Salário', 5890.67, 39, 133, '74665ecf', 0, 0, 14, 2, 2024, 17),
+(66, 'Editado', 250.69, 31, 133, '74665ecf', 0, 0, 14, 2, 2024, 16),
+(67, 'Vale', 610, 32, 133, '74665ecf', 0, 0, 14, 2, 2024, 16),
+(68, 'Salário', 2.5, 24, 133, '74665ecf', 0, 0, 14, 2, 2024, 16),
+(69, 'Teste da madrugada ', 666, 18, 133, '74665ecf', 0, 0, 14, 2, 2024, 17);
 
 -- --------------------------------------------------------
 
@@ -303,7 +315,7 @@ CREATE TABLE `usuario` (
 --
 
 INSERT INTO `usuario` (`id`, `nome`, `email`, `senha`, `casal`, `email_parceiro`, `dt_criacao`, `ultimo_acesso`) VALUES
-(133, 'Gideone', 'gideonilacerda@gmail.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', '74665ecf', 'gideonilc@hotmail.com', '2024-03-05 16:10:29', '2024-03-11 21:28:57'),
+(133, 'Gideone', 'gideonilacerda@gmail.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', '74665ecf', 'gideonilc@hotmail.com', '2024-03-05 16:10:29', '2024-03-14 20:40:58'),
 (134, 'Thamy', 'gideonilc@hotmail.com', '221b37fcdb52d0f7c39bbd0be211db0e1c00ca5fbecd5788780463026c6b964b', '74665ecf', '', '2024-03-05 16:12:37', '0000-00-00 00:00:00'),
 (137, 'Gideone 2', 'gideonelacerda@hotmail.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', '237feb85', 'thamy@email.com', '2024-02-26 11:37:00', '2024-03-07 17:31:37'),
 (138, 'Thamilly', 'thamy@email.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', '237feb85', 'gideonilacerda@hotmail.com', '2024-03-07 16:22:55', '2024-03-07 14:43:08');
@@ -344,9 +356,9 @@ ALTER TABLE `cor`
   ADD PRIMARY KEY (`id`);
 
 --
--- Índices para tabela `despesa_col`
+-- Índices para tabela `despesa`
 --
-ALTER TABLE `despesa_col`
+ALTER TABLE `despesa`
   ADD PRIMARY KEY (`id`),
   ADD KEY `fk_despesa_col_casal` (`casal`),
   ADD KEY `fk_despesa_col_categoria` (`categoria`),
@@ -415,7 +427,7 @@ ALTER TABLE `casal`
 -- AUTO_INCREMENT de tabela `categoria_tr`
 --
 ALTER TABLE `categoria_tr`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
 -- AUTO_INCREMENT de tabela `cor`
@@ -424,10 +436,10 @@ ALTER TABLE `cor`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
--- AUTO_INCREMENT de tabela `despesa_col`
+-- AUTO_INCREMENT de tabela `despesa`
 --
-ALTER TABLE `despesa_col`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+ALTER TABLE `despesa`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT de tabela `icones`
@@ -451,7 +463,7 @@ ALTER TABLE `objetivo`
 -- AUTO_INCREMENT de tabela `receita`
 --
 ALTER TABLE `receita`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=70;
 
 --
 -- AUTO_INCREMENT de tabela `senha_temp`
@@ -491,12 +503,12 @@ ALTER TABLE `categoria_tr`
   ADD CONSTRAINT `fk_categoria_tr_icone` FOREIGN KEY (`icone`) REFERENCES `icones` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
--- Limitadores para a tabela `despesa_col`
+-- Limitadores para a tabela `despesa`
 --
-ALTER TABLE `despesa_col`
-  ADD CONSTRAINT `fk_despesa_col_banco` FOREIGN KEY (`banco`) REFERENCES `banco` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_despesa_col_casal` FOREIGN KEY (`casal`) REFERENCES `casal` (`cod_casal`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_despesa_col_categoria` FOREIGN KEY (`categoria`) REFERENCES `categoria_tr` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE `despesa`
+  ADD CONSTRAINT `fk_despesa_banco` FOREIGN KEY (`banco`) REFERENCES `banco` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_despesa_casal` FOREIGN KEY (`casal`) REFERENCES `casal` (`cod_casal`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_despesa_categoria` FOREIGN KEY (`categoria`) REFERENCES `categoria_tr` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Limitadores para a tabela `log`
