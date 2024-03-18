@@ -21,7 +21,7 @@ const cadastroUsuario = (req, res) => {
       console.error('Erro ao salvar o usuário:', err);
       return res.status(500).json({ error: 'Erro ao salvar o usuário' });
     }
-    res.status(200).json({ message: 'Usuário salvo com sucesso', resultado });
+    res.status(200).json({ message: 'Usuário cadastrado com sucesso', resultado });
   });
 };
 

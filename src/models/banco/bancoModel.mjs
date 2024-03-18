@@ -36,7 +36,15 @@ class BancoModel {
         });
     }
 
-    static updateBanco = (saldo_inicial, casal, nome, tipo, callback) => {
+    static readBancoID = (cod_casal, usuario, id, tipo, callback) => {
+        if(tipo == "") {
+
+        }
+        const query = `SELECT * FROM banco WHERE casal = ? AND usuario = `;
+        connection.query(query, [])
+    }
+
+    static editBanco = (saldo_inicial, casal, nome, tipo, callback) => {
 
     }
 
@@ -77,7 +85,7 @@ class BancoModel {
 
                 const receitas = receitasBD[0].total_receitas || 0;
 
-                const queryDespesas = 'SELECT SUM(valor) AS total_despesas FROM despesa_col WHERE banco = ? AND casal = ?';
+                const queryDespesas = 'SELECT SUM(valor) AS total_despesas FROM despesa WHERE banco = ? AND casal = ?';
                 const despesasBD = await new Promise((resolve, reject) => {
                     connection.query(queryDespesas, [banco.id, casal], (err, results) => {
                         if (err) {

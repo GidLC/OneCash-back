@@ -10,7 +10,7 @@ class ReceitaModel {
             if (err) {
                 return callback(err, null)
             }
-
+            console.log({descricao, valor, usuario, cod_casal, categoria, status, data, banco})
             return callback(null, results)
         })
     }

@@ -5,31 +5,103 @@ import enviaEmail from "../../data/enviaEmail/enviaEmail.mjs";
 
 class AuthModel {
 
-  static cadastroUsuario = (nome, email, senha, email_parceiro, dt_criacao, callback) => {
-    const codigoCasal = crypto.randomBytes(4).toString('hex');
+  static cadastroUsuario = async (nome, email, senha, email_parceiro, dt_criacao, callback) => {
+    const codigoCasal = crypto.randomBytes(3).toString('hex');
     const senhaHash = crypto.createHash('sha256').update(senha).digest('hex');
 
-    const query = 'INSERT INTO usuario (nome, email, senha, email_parceiro, casal, dt_criacao) VALUES (?, ?, ?, ?, ?, ?)';
-    connection.query(query, [nome, email, senhaHash, email_parceiro, codigoCasal, dt_criacao], async (err, results) => {
-      if (err) {
-        return callback(err, null);
-      }
-      /*await enviaEmail(email,
-        "Cadastro no OneCash",
-        `Você acaba de se cadastrar no OneCash, o melhor aplicativo de finanças familiar. O código casal seu e de seu(sua) parceiro(a) é o ${codigoCasal}. 
-          Seu parceiro(a) vai precisar dele para se vincular a você, mas não se preocupe já enviamos pra ele(a) também`);
+    //categorias de despesa padrão: Alimentação, Moradia, transporte, saúde, educação, lazer, roupas e acessórios, água/luz/internet, despesas diversas
+    //categorias de receita padrão: Salário, rendimentos, presentes, vales
 
-      await enviaEmail(email_parceiro,
-        "Cadastro no OneCash",
-        `${nome} acaba de se cadastrar no aplicativo OneCash e te colocou como parceiro dele. 
-          Seu código para se vincular a ele e criar o casal de vocês em nosso aplicativo é ${codigoCasal}.`)*/
+    const queryUsuario = 'INSERT INTO usuario (nome, email, senha, email_parceiro, casal, dt_criacao) VALUES (?, ?, ?, ?, ?, ?)';
 
-      return callback(null, { results })
+    const usuario = await new Promise((resolve, reject) => {
+      connection.query(queryUsuario, [nome, email, senhaHash, email_parceiro, codigoCasal, dt_criacao], async (err, results) => {
+        if (err) {
+          reject(err)
+        }
+
+        /*await enviaEmail(email,
+          "Cadastro no OneCash",
+          `Você acaba de se cadastrar no OneCash, o melhor aplicativo de finanças familiar. O código casal seu e de seu(sua) parceiro(a) é o ?. 
+            Seu parceiro(a) vai precisar dele para se vincular a você, mas não se preocupe já enviamos pra ele(a) também`);
+
+        await enviaEmail(email_parceiro,
+          "Cadastro no OneCash",
+          `${nome} acaba de se cadastrar no aplicativo OneCash e te colocou como parceiro dele. 
+            Seu código para se vincular a ele e criar o casal de vocês em nosso aplicativo é ?.`)*/
+
+        resolve(results)
+      });
+    })
+
+    const userId = usuario.insertId;
+
+    const queryCasal = 'INSERT INTO casal (cod_casal, usuario_princ) VALUES (?, ?)';
+    const casalResult = await new Promise((resolve, reject) => {
+      connection.query(queryCasal, [codigoCasal, userId], (err, results) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(results);
+      });
     });
+
+    const queryCategoria = `
+    INSERT INTO categoria_tr (nome, tipo, cor, icone, casal) VALUES("Alimentação", 0, 2, 21, ?);
+    INSERT INTO categoria_tr (nome, tipo, cor, icone, casal) VALUES("Moradia", 0, 3, 27, ?);
+    INSERT INTO categoria_tr (nome, tipo, cor, icone, casal) VALUES("Transporte", 0, 4, 16, ?);
+    INSERT INTO categoria_tr (nome, tipo, cor, icone, casal) VALUES("Saúde", 0, 5, 29, ?);
+    INSERT INTO categoria_tr (nome, tipo, cor, icone, casal) VALUES("Educação", 0, 6, 11, ?);
+    INSERT INTO categoria_tr (nome, tipo, cor, icone, casal) VALUES("Lazer", 0, 7, 28, ?);
+    INSERT INTO categoria_tr (nome, tipo, cor, icone, casal) VALUES("Roupas e Acessórios", 0, 8, 33, ?);
+    INSERT INTO categoria_tr (nome, tipo, cor, icone, casal) VALUES("Água/Luz/Internet", 0, 9, 39, ?);
+    INSERT INTO categoria_tr (nome, tipo, cor, icone, casal) VALUES("Despesas Diversas", 0, 10, 36, ?);
+    INSERT INTO categoria_tr (nome, tipo, cor, icone, casal) VALUES("Salário", 1, 11, 38, ?);
+    INSERT INTO categoria_tr (nome, tipo, cor, icone, casal) VALUES("Rendimentos", 1, 12, 37, ?);
+    INSERT INTO categoria_tr (nome, tipo, cor, icone, casal) VALUES("Presentes", 1, 13, 26, ?);
+    INSERT INTO categoria_tr (nome, tipo, cor, icone, casal) VALUES("Vales", 1, 14, 31, ?);
+    `;
+
+    try {
+      const queries = queryCategoria.split(';').filter(query => query.trim() !== '');
+      await Promise.all(queries.map((query) => {
+        return new Promise((resolve, reject) => {
+          connection.query(query, [codigoCasal], (err, results) => {
+            if (err) {
+              reject(err);
+            }
+            resolve(results);
+          });
+        });
+      }));
+    } catch (error) {
+      console.error("Erro ao inserir categorias:", error);
+    }
+
+    const queryBancos = `
+                        INSERT INTO banco (nome, tipo, saldo_inicial, casal, usuario) VALUES ("Carteira", 0, 0, ?, ?);
+                        INSERT INTO banco (nome, tipo, saldo_inicial, casal, usuario) VALUES ("Nossa Conta", 1, 0, ?, ?);`
+
+    try {
+      const queries = queryBancos.split(';').filter(query => query.trim() !== '');
+      await Promise.all(queries.map((query) => {
+        return new Promise((resolve, reject) => {
+          connection.query(query, [codigoCasal, userId], (err, results) => {
+            if (err) {
+              reject(err);
+            }
+            resolve(results);
+          });
+        });
+      }));
+    } catch (error) {
+      console.error("Erro ao inserir Bancos:", error);
+    }
+
+    return callback(null, "Usuário cadastrado")
   }
 
   static buscaCadastro(codigo, callback) {
-    console.log(codigo)
     const query = 'SELECT nome, id FROM usuario WHERE casal = ?';
     connection.query(query, [codigo], (err, results) => {
       if (err) {
@@ -74,15 +146,33 @@ class AuthModel {
     const userId = usuarioResult.insertId;
 
     //Cria linha na tabela de casal
-    const queryCasal = 'INSERT INTO casal (cod_casal, usuario_princ, usuario_sec) VALUES (?, ?, ?)';
+    const queryCasal = 'UPDATE casal SET usuario_sec = ?';
     const casalResult = await new Promise((resolve, reject) => {
-      connection.query(queryCasal, [cod_casal, id_usuario_princ, userId], (err, results) => {
+      connection.query(queryCasal, [userId], (err, results) => {
         if (err) {
           reject(err);
         }
         resolve(results);
       });
     });
+
+    const queryBancos = `INSERT INTO banco (nome, tipo, saldo_inicial, casal, usuario) VALUES ("Carteira", 0, 0, ?, ?);`
+
+    try {
+      const queries = queryBancos.split(';').filter(query => query.trim() !== '');
+      await Promise.all(queries.map((query) => {
+        return new Promise((resolve, reject) => {
+          connection.query(query, [cod_casal, userId], (err, results) => {
+            if (err) {
+              reject(err);
+            }
+            resolve(results);
+          });
+        });
+      }));
+    } catch (error) {
+      console.error("Erro ao inserir Banco:", error);
+    }
 
     return callback(null, casalResult);
   }
@@ -158,7 +248,7 @@ class AuthModel {
         email_parceiro: login[0].email_parceiro,
         cod_casal: casal[0].cod_casal,
         id_parceiro: id_parceiro,
-        nome_parceiro: parceiro[0].nome
+        //nome_parceiro: parceiro[0].nome
       })
     } else {
       const id_parceiro = casal[0].usuario_princ
@@ -187,7 +277,6 @@ class AuthModel {
   }
 
   static buscaCadastroEmail = async (email, callback) => {
-    console.log(email)
     const token = crypto.randomBytes(2).toString('hex');
     const data = new Date()
     const validade = new Date(data.getTime() + 2 * 60 * 60 * 1000).toISOString();
