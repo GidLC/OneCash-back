@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 15-Mar-2024 às 01:47
+-- Tempo de geração: 19-Mar-2024 às 01:19
 -- Versão do servidor: 10.4.32-MariaDB
 -- versão do PHP: 8.0.30
 
@@ -30,10 +30,10 @@ SET time_zone = "+00:00";
 CREATE TABLE `banco` (
   `id` int(11) NOT NULL,
   `nome` varchar(100) NOT NULL,
-  `tipo` tinyint(1) NOT NULL COMMENT '1: individual\r\n2: conjunta',
+  `tipo` tinyint(1) NOT NULL COMMENT '0: individual\r\n1: conjunta',
   `saldo_inicial` float NOT NULL,
   `casal` varchar(10) NOT NULL,
-  `usuario` int(50) NOT NULL
+  `usuario` int(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -41,8 +41,9 @@ CREATE TABLE `banco` (
 --
 
 INSERT INTO `banco` (`id`, `nome`, `tipo`, `saldo_inicial`, `casal`, `usuario`) VALUES
-(16, 'Bradesco', 2, 5000, '74665ecf', 0),
-(17, 'Banco do Brasil', 1, 1500.75, '74665ecf', 133);
+(19, 'Carteira', 0, 0, '2c994a', 152),
+(20, 'Nossa Conta', 1, 0, '2c994a', 152),
+(21, 'Carteira', 0, 0, '2c994a', 153);
 
 -- --------------------------------------------------------
 
@@ -54,7 +55,7 @@ CREATE TABLE `casal` (
   `id` int(255) NOT NULL,
   `cod_casal` varchar(255) NOT NULL,
   `usuario_princ` int(255) NOT NULL,
-  `usuario_sec` int(255) NOT NULL
+  `usuario_sec` int(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -62,8 +63,7 @@ CREATE TABLE `casal` (
 --
 
 INSERT INTO `casal` (`id`, `cod_casal`, `usuario_princ`, `usuario_sec`) VALUES
-(32, '74665ecf', 133, 134),
-(33, '237feb85', 137, 138);
+(37, '2c994a', 152, 153);
 
 -- --------------------------------------------------------
 
@@ -85,13 +85,19 @@ CREATE TABLE `categoria_tr` (
 --
 
 INSERT INTO `categoria_tr` (`id`, `nome`, `tipo`, `cor`, `icone`, `casal`) VALUES
-(18, 'Dinheiro', 1, 3, 12, '74665ecf'),
-(24, 'Salário', 1, 4, 37, '74665ecf'),
-(29, 'Comida', 0, 3, 21, '74665ecf'),
-(30, 'Energia ', 0, 3, 24, '74665ecf'),
-(31, 'sa', 0, 2, 36, '74665ecf'),
-(32, 'Vale Alimentação', 1, 6, 31, '74665ecf'),
-(42, 'Presente ', 1, 10, 26, '74665ecf');
+(70, 'Alimentação', 0, 2, 21, '2c994a'),
+(71, 'Moradia', 0, 3, 27, '2c994a'),
+(72, 'Transporte', 0, 4, 16, '2c994a'),
+(73, 'Saúde', 0, 21, 29, '2c994a'),
+(74, 'Educação', 0, 6, 11, '2c994a'),
+(75, 'Lazer', 0, 7, 28, '2c994a'),
+(76, 'Roupas e Acessórios', 0, 8, 33, '2c994a'),
+(77, 'Água/Luz/Internet', 0, 9, 39, '2c994a'),
+(78, 'Despesas Diversas', 0, 10, 36, '2c994a'),
+(79, 'Salário', 1, 11, 38, '2c994a'),
+(80, 'Rendimentos', 1, 12, 37, '2c994a'),
+(81, 'Presentes', 1, 13, 26, '2c994a'),
+(82, 'Vales', 1, 14, 31, '2c994a');
 
 -- --------------------------------------------------------
 
@@ -153,14 +159,6 @@ CREATE TABLE `despesa` (
   `compra` int(11) NOT NULL,
   `banco` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Extraindo dados da tabela `despesa`
---
-
-INSERT INTO `despesa` (`id`, `descricao`, `valor`, `status`, `casal`, `usuario`, `dia`, `mes`, `ano`, `categoria`, `tipo`, `compra`, `banco`) VALUES
-(15, 'Editado', 250.69, 0, '74665ecf', 0, 14, 2, 2024, 31, 0, 0, 16),
-(16, 'Aluguel', 500, 0, '74665ecf', 0, 14, 2, 2024, 29, 0, 0, 16);
 
 -- --------------------------------------------------------
 
@@ -274,11 +272,8 @@ CREATE TABLE `receita` (
 --
 
 INSERT INTO `receita` (`id`, `descricao`, `valor`, `categoria`, `usuario`, `casal`, `status`, `tipo`, `dia`, `mes`, `ano`, `banco`) VALUES
-(65, 'Salário', 5890.67, 39, 133, '74665ecf', 0, 0, 14, 2, 2024, 17),
-(66, 'Editado', 250.69, 31, 133, '74665ecf', 0, 0, 14, 2, 2024, 16),
-(67, 'Vale', 610, 32, 133, '74665ecf', 0, 0, 14, 2, 2024, 16),
-(68, 'Salário', 2.5, 24, 133, '74665ecf', 0, 0, 14, 2, 2024, 16),
-(69, 'Teste da madrugada ', 666, 18, 133, '74665ecf', 0, 0, 14, 2, 2024, 17);
+(70, 'Teste', 500, 79, 152, '2c994a', 0, 0, 18, 2, 2024, 19),
+(72, 'vale', 616, 82, 152, '2c994a', 1, 0, 18, 2, 2024, 19);
 
 -- --------------------------------------------------------
 
@@ -315,10 +310,8 @@ CREATE TABLE `usuario` (
 --
 
 INSERT INTO `usuario` (`id`, `nome`, `email`, `senha`, `casal`, `email_parceiro`, `dt_criacao`, `ultimo_acesso`) VALUES
-(133, 'Gideone', 'gideonilacerda@gmail.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', '74665ecf', 'gideonilc@hotmail.com', '2024-03-05 16:10:29', '2024-03-14 20:40:58'),
-(134, 'Thamy', 'gideonilc@hotmail.com', '221b37fcdb52d0f7c39bbd0be211db0e1c00ca5fbecd5788780463026c6b964b', '74665ecf', '', '2024-03-05 16:12:37', '0000-00-00 00:00:00'),
-(137, 'Gideone 2', 'gideonelacerda@hotmail.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', '237feb85', 'thamy@email.com', '2024-02-26 11:37:00', '2024-03-07 17:31:37'),
-(138, 'Thamilly', 'thamy@email.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', '237feb85', 'gideonilacerda@hotmail.com', '2024-03-07 16:22:55', '2024-03-07 14:43:08');
+(152, 'Gideone', 'gideonilacerda@gmail.com', '15e2b0d3c33891ebb0f1ef609ec419420c20e320ce94c65fbc8c3312448eb225', '2c994a', 'gideonilc@hotmail.com', '2024-03-18 20:31:55', '2024-03-18 21:44:44'),
+(153, 'Thâmily ', 'gideonilc@hotmail.com', '15e2b0d3c33891ebb0f1ef609ec419420c20e320ce94c65fbc8c3312448eb225', '2c994a', '', '2024-03-18 20:34:51', '2024-03-18 20:36:21');
 
 --
 -- Índices para tabelas despejadas
@@ -329,7 +322,8 @@ INSERT INTO `usuario` (`id`, `nome`, `email`, `senha`, `casal`, `email_parceiro`
 --
 ALTER TABLE `banco`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_banco_casal` (`casal`);
+  ADD KEY `fk_banco_casal` (`casal`),
+  ADD KEY `fk_banco_usuario` (`usuario`);
 
 --
 -- Índices para tabela `casal`
@@ -415,19 +409,19 @@ ALTER TABLE `usuario`
 -- AUTO_INCREMENT de tabela `banco`
 --
 ALTER TABLE `banco`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT de tabela `casal`
 --
 ALTER TABLE `casal`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- AUTO_INCREMENT de tabela `categoria_tr`
 --
 ALTER TABLE `categoria_tr`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=83;
 
 --
 -- AUTO_INCREMENT de tabela `cor`
@@ -463,7 +457,7 @@ ALTER TABLE `objetivo`
 -- AUTO_INCREMENT de tabela `receita`
 --
 ALTER TABLE `receita`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=70;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=75;
 
 --
 -- AUTO_INCREMENT de tabela `senha_temp`
@@ -475,7 +469,7 @@ ALTER TABLE `senha_temp`
 -- AUTO_INCREMENT de tabela `usuario`
 --
 ALTER TABLE `usuario`
-  MODIFY `id` int(254) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=140;
+  MODIFY `id` int(254) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=154;
 
 --
 -- Restrições para despejos de tabelas
@@ -485,7 +479,8 @@ ALTER TABLE `usuario`
 -- Limitadores para a tabela `banco`
 --
 ALTER TABLE `banco`
-  ADD CONSTRAINT `fk_banco_casal` FOREIGN KEY (`casal`) REFERENCES `casal` (`cod_casal`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_banco_casal` FOREIGN KEY (`casal`) REFERENCES `casal` (`cod_casal`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_banco_usuario` FOREIGN KEY (`usuario`) REFERENCES `usuario` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Limitadores para a tabela `casal`
