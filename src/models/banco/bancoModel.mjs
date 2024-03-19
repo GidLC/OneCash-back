@@ -3,7 +3,7 @@ import { connection } from "../../config.mjs";
 
 class BancoModel {
     static addBanco = (saldo_inicial, casal, nome, tipo, usuario, callback) => {
-        if (tipo == 1) {
+        if (tipo == 0) {
             const query = 'INSERT INTO banco (nome, tipo, saldo_inicial, casal, usuario) VALUES (?,?,?,?,?)';
             connection.query(query, [nome, tipo, saldo_inicial, casal, usuario], (err, results) => {
                 if (err) {
@@ -12,7 +12,7 @@ class BancoModel {
 
                 return callback(null, results)
             })
-        } else {
+        } else  {
             const query = 'INSERT INTO banco (nome, tipo, saldo_inicial, casal) VALUES (?,?,?,?)';
             connection.query(query, [nome, tipo, saldo_inicial, casal], (err, results) => {
                 if (err) {
@@ -25,8 +25,10 @@ class BancoModel {
 
     }
 
-    static readBanco = (cod_casal, callback) => {
+    static readBanco = async (cod_casal, callback) => {
+        //bancos individuais
         const query = 'SELECT * FROM banco where casal = ?';
+        const bancosInd = await new Promise((resolve, reject))
         connection.query(query, [cod_casal], (err, results) => {
             if (err) {
                 return callback(err, null)
