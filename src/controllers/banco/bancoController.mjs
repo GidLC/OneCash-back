@@ -2,13 +2,13 @@ import BancoModel from "../../models/banco/bancoModel.mjs";
 
 const addBanco = (req, res) => {
     console.log(req.body)
-    const {saldo_inicial, nome, tipo} = req.body;
+    const { saldo_inicial, nome, tipo } = req.body;
     const casal = req.header('auth');
     const usuario = req.header('usuario')
     BancoModel.addBanco(saldo_inicial, casal, nome, tipo, usuario, (err, results) => {
-        if(err) {
+        if (err) {
             console.error('Erro ao cadastrar banco', err);
-            return res.status(500).json({error: 'Erro ao cadastrar banco'});
+            return res.status(500).json({ error: 'Erro ao cadastrar banco' });
         }
 
         res.status(200).json({ message: 'Banco cadastrado com sucesso', results });
@@ -17,26 +17,48 @@ const addBanco = (req, res) => {
 
 const readBanco = (req, res) => {
     const cod_casal = req.header('auth');
-    BancoModel.readBanco(cod_casal, (err, results) => {
+    const usuario = req.header('usuario');
+    BancoModel.readBanco(cod_casal, usuario, (err, results) => {
         if(err) {
             return res.status(500).json({error: 'Erro ao encontrar bancos'});
+        } else if(results.length == 0) {
+            console.log(cod_casal, usuario)
+            return res.status(500).json({error: 'Erro ao encontrar banco'});
         }
+        console.log(cod_casal, usuario)
 
         res.status(200).json({message: 'Bancos encontrados', results});
     });
 };
 
-const saldoBanco = (req, res) => {
-    const casal = req.header('auth');
+const readBancoID = (req, res) => {
+    const cod_casal = req.header('auth');
+    const id = req.header("id");
 
-    BancoModel.saldoBanco(casal, (err, results) => {
+    BancoModel.readBancoID(cod_casal, id, (err, results) => {
         if(err) {
-            return res.status(500).json({error: 'Erro ao encontrar o saldo do banco'});
+            return res.status(500).json({error: 'Erro ao encontrar banco'});
+        } else if(results.lenght == 0) {
+            return res.status(500).json({error: 'Erro ao encontrar banco'});
         }
 
-        res.status(200).json({message: 'Saldo encontrado', results});
+        res.status(200).json({message: 'Banco encontrado', results});
+    });
+};
+
+const saldoBanco = (req, res) => {
+    const casal = req.header('auth');
+    const usuario = req.header('usuario');
+    const tipo = req.header('tipo')
+
+    BancoModel.saldoBanco(casal, usuario, tipo, (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: 'Erro ao encontrar o saldo do banco' });
+        }
+
+        res.status(200).json({ message: 'Saldo encontrado', results });
     })
 }
 
 
-export default {addBanco, readBanco, saldoBanco}
+export default { addBanco, readBanco, readBancoID, saldoBanco }

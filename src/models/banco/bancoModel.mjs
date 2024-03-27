@@ -12,7 +12,7 @@ class BancoModel {
 
                 return callback(null, results)
             })
-        } else  {
+        } else {
             const query = 'INSERT INTO banco (nome, tipo, saldo_inicial, casal) VALUES (?,?,?,?)';
             connection.query(query, [nome, tipo, saldo_inicial, casal], (err, results) => {
                 if (err) {
@@ -25,86 +25,164 @@ class BancoModel {
 
     }
 
-    static readBanco = async (cod_casal, callback) => {
+    static readBanco = async (cod_casal, usuario, callback) => {
         //bancos individuais
-        const query = 'SELECT * FROM banco where casal = ?';
-        const bancosInd = await new Promise((resolve, reject))
-        connection.query(query, [cod_casal], (err, results) => {
+        const queryBancoInd = 'SELECT id, nome, tipo, saldo_inicial FROM banco where casal = ? AND usuario = ? AND tipo = 0';
+        const bancosInd = await new Promise((resolve, reject) => {
+            connection.query(queryBancoInd, [cod_casal, usuario], (err, results) => {
+                if (err) {
+                    reject(err)
+                }
+
+                resolve(results)
+            });
+        });
+
+        const queryBancoCol = 'SELECT id, nome, tipo, saldo_inicial FROM banco where casal = ? AND tipo = 1';
+        const bancosCol = await new Promise((resolve, reject) => {
+            connection.query(queryBancoCol, [cod_casal, usuario], (err, results) => {
+                if (err) {
+                    reject(err)
+                }
+
+                resolve(results)
+            });
+        });
+
+        const bancos = [...bancosInd, ...bancosCol]
+
+        callback(null, bancos)
+    }
+
+    static readBancoID = (cod_casal, id, callback) => {
+        const query = `SELECT id, nome, tipo, saldo_inicial FROM banco WHERE casal = ? AND id = ?`;
+        connection.query(query, [cod_casal, id], (err, results) => {
             if (err) {
                 return callback(err, null)
             }
-
-            return callback(null, results)
+            console.log(results[0])
+            return callback(null, results[0])
         });
     }
 
-    static readBancoID = (cod_casal, usuario, id, tipo, callback) => {
-        if(tipo == "") {
-
-        }
-        const query = `SELECT * FROM banco WHERE casal = ? AND usuario = `;
-        connection.query(query, [])
-    }
-
-    static editBanco = (saldo_inicial, casal, nome, tipo, callback) => {
-
-    }
-
-    static saldoBanco = async (casal, callback) => {
+    static saldoBanco = async (casal, usuario, tipo, callback) => {
         try {
-            const queryBanco = 'SELECT * FROM banco WHERE casal = ?';
-            const bancosBD = await new Promise((resolve, reject) => {
-                connection.query(queryBanco, [casal], (err, results) => {
-                    if (err) {
-                        reject(err)
-                    }
-                    resolve(results)
-                });
-            });
-
-            const bancosComSaldo = await Promise.all(bancosBD.map(async (banco) => {
-                const saldoInicialBD = await new Promise((resolve, reject) => {
-                    const querysaldoInicial = 'SELECT saldo_inicial FROM banco WHERE id = ? AND casal = ?';
-                    connection.query(querysaldoInicial, [banco.id, casal], (err, results) => {
+            //Saldos individuais
+            if (tipo == 0) {
+                const queryBancoInd = 'SELECT * FROM banco WHERE casal = ? AND usuario = ? AND tipo = 0';
+                const bancosBDInd = await new Promise((resolve, reject) => {
+                    connection.query(queryBancoInd, [casal, usuario], (err, results) => {
                         if (err) {
-                            reject(err);
+                            reject(err)
                         }
-                        resolve(results);
+                        resolve(results)
+                    });
+                });
+                console.log(bancosBDInd)
+
+                const bancosComSaldoInd = await Promise.all(bancosBDInd.map(async (banco) => {
+                    const saldoInicialBD = await new Promise((resolve, reject) => {
+                        const querysaldoInicial = 'SELECT saldo_inicial FROM banco WHERE id = ? AND casal = ? AND usuario = ? AND tipo = 0';
+                        connection.query(querysaldoInicial, [banco.id, casal, usuario], (err, results) => {
+                            if (err) {
+                                reject(err);
+                            }
+                            resolve(results);
+                        });
+                    });
+
+                    const saldoInicial = saldoInicialBD[0].saldo_inicial;
+
+                    const queryreceitas = 'SELECT SUM(valor) AS total_receitas FROM receita WHERE banco = ? AND casal = ? AND usuario = ?';
+                    const receitasBD = await new Promise((resolve, reject) => {
+                        connection.query(queryreceitas, [banco.id, casal, usuario], (err, results) => {
+                            if (err) {
+                                reject(err);
+                            }
+                            resolve(results);
+                        });
+                    });
+
+                    const receitas = receitasBD[0].total_receitas || 0;
+
+                    const queryDespesas = 'SELECT SUM(valor) AS total_despesas FROM despesa WHERE banco = ? AND casal = ? AND usuario = ?';
+                    const despesasBD = await new Promise((resolve, reject) => {
+                        connection.query(queryDespesas, [banco.id, casal, usuario], (err, results) => {
+                            if (err) {
+                                reject(err);
+                            }
+                            resolve(results);
+                        });
+                    });
+
+                    const despesas = despesasBD[0].total_despesas || 0;
+
+                    const saldo = saldoInicial + receitas - despesas;
+
+                    return { ...banco, saldo, saldoInicial };
+                }));
+
+                console.log(bancosComSaldoInd)
+                return callback(null, bancosComSaldoInd);
+                //Saldos conjuntos
+            } else if (tipo == 1) {
+
+                const queryBanco = 'SELECT * FROM banco WHERE casal = ? AND tipo = 1';
+                const bancosBD = await new Promise((resolve, reject) => {
+                    connection.query(queryBanco, [casal], (err, results) => {
+                        if (err) {
+                            reject(err)
+                        }
+                        resolve(results)
                     });
                 });
 
-                const saldoInicial = saldoInicialBD[0].saldo_inicial;
-
-                const queryreceitas = 'SELECT SUM(valor) AS total_receitas FROM receita WHERE banco = ? AND casal = ?';
-                const receitasBD = await new Promise((resolve, reject) => {
-                    connection.query(queryreceitas, [banco.id, casal], (err, results) => {
-                        if (err) {
-                            reject(err);
-                        }
-                        resolve(results);
+                const bancosComSaldo = await Promise.all(bancosBD.map(async (banco) => {
+                    const saldoInicialBD = await new Promise((resolve, reject) => {
+                        const querysaldoInicial = 'SELECT saldo_inicial FROM banco WHERE id = ? AND casal = ? AND tipo = 1';
+                        connection.query(querysaldoInicial, [banco.id, casal], (err, results) => {
+                            if (err) {
+                                reject(err);
+                            }
+                            resolve(results);
+                        });
                     });
-                });
 
-                const receitas = receitasBD[0].total_receitas || 0;
+                    const saldoInicial = saldoInicialBD[0].saldo_inicial;
 
-                const queryDespesas = 'SELECT SUM(valor) AS total_despesas FROM despesa WHERE banco = ? AND casal = ?';
-                const despesasBD = await new Promise((resolve, reject) => {
-                    connection.query(queryDespesas, [banco.id, casal], (err, results) => {
-                        if (err) {
-                            reject(err);
-                        }
-                        resolve(results);
+                    const queryreceitas = 'SELECT SUM(valor) AS total_receitas FROM receita WHERE banco = ? AND casal = ?';
+                    const receitasBD = await new Promise((resolve, reject) => {
+                        connection.query(queryreceitas, [banco.id, casal], (err, results) => {
+                            if (err) {
+                                reject(err);
+                            }
+                            resolve(results);
+                        });
                     });
-                });
 
-                const despesas = despesasBD[0].total_despesas || 0;
+                    const receitas = receitasBD[0].total_receitas || 0;
+                    console.log(banco.id, casal)
 
-                const saldo = saldoInicial + receitas - despesas;
+                    const queryDespesas = 'SELECT SUM(valor) AS total_despesas FROM despesa WHERE banco = ? AND casal = ?';
+                    const despesasBD = await new Promise((resolve, reject) => {
+                        connection.query(queryDespesas, [banco.id, casal], (err, results) => {
+                            if (err) {
+                                reject(err);
+                            }
+                            resolve(results);
+                        });
+                    });
 
-                return { ...banco, saldo, saldoInicial };
-            }));
+                    const despesas = despesasBD[0].total_despesas || 0;
 
-            return callback(null, bancosComSaldo);
+                    const saldo = saldoInicial + receitas - despesas;
+
+                    return { ...banco, saldo, saldoInicial };
+                }));
+
+                return callback(null, bancosComSaldo);
+            }
+
         } catch (error) {
             console.error(`Não foi possível gerar o saldo ${error}`);
             return callback(error, null);

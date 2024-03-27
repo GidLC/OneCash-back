@@ -26,7 +26,7 @@ class CategoriaTrModel {
     }
 
     static loadCategoriaTrID = (auth, id, callback) => {
-        const query = 'SELECT * FROM categoria_tr where casal = ? AND id = ?';
+        const query = 'SELECT id, nome, tipo, cor, icone FROM categoria_tr where casal = ? AND id = ?';
         connection.query(query, [auth, id], (err, results) => {
             if (err) {
                 return callback(err, null)

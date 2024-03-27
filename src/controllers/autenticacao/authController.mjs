@@ -26,14 +26,18 @@ const cadastroUsuario = (req, res) => {
 };
 
 const buscaCadastro = (req, res) => {
-  console.log(`buscaCadastro`)
   const { codigo } = req.params;
-  AuthModel.buscaCadastro(codigo, (err, resultados) => {
+  AuthModel.buscaCadastro(codigo, (err, results) => {
     if (err) {
-      console.error('Erro ao listar os produtos:', err);
-      return res.status(500).json({ error: 'Erro ao listar os produtos' });
+      console.error('Erro ao encontrar cadastro:', err);
+      return res.status(500).json({ error: 'Erro ao encontrar cadastro' });
+    } else if(results == 0) {
+      return res.status(200).json({ message: 'Não há usuário no aplicativo com esse código', results });
+    } else if (results == 1) {
+      console.log(`PARCEIRO`)
+      return res.status(200).json({ message: 'Esse usuário já possui um parceiro', results });
     }
-    res.status(200).json(resultados);
+    res.status(200).json(results);
   });
 };
 

@@ -20,15 +20,16 @@ class AuthModel {
           reject(err)
         }
 
-        /*await enviaEmail(email,
+        await enviaEmail(email,
           "Cadastro no OneCash",
-          `Você acaba de se cadastrar no OneCash, o melhor aplicativo de finanças familiar. O código casal seu e de seu(sua) parceiro(a) é o ?. 
+          `Você acaba de se cadastrar no OneCash, o melhor aplicativo de finanças familiar. O código casal seu e de seu(sua) parceiro(a) é o ${codigoCasal}. 
             Seu parceiro(a) vai precisar dele para se vincular a você, mas não se preocupe já enviamos pra ele(a) também`);
 
         await enviaEmail(email_parceiro,
           "Cadastro no OneCash",
           `${nome} acaba de se cadastrar no aplicativo OneCash e te colocou como parceiro dele. 
-            Seu código para se vincular a ele e criar o casal de vocês em nosso aplicativo é ?.`)*/
+            Seu código para se vincular a ele e criar o casal de vocês em nosso aplicativo é ${codigoCasal}.
+            Para se vincular basta baixar nosso aplicativo e ir em CADASTRE-SE - ATRIBUIÇÃO. Coloque lá o código recebido e realize o cadastro de sua própria conta.`)
 
         resolve(results)
       });
@@ -37,7 +38,7 @@ class AuthModel {
     const userId = usuario.insertId;
 
     const queryCasal = 'INSERT INTO casal (cod_casal, usuario_princ) VALUES (?, ?)';
-    const casalResult = await new Promise((resolve, reject) => {
+    await new Promise((resolve, reject) => {
       connection.query(queryCasal, [codigoCasal, userId], (err, results) => {
         if (err) {
           reject(err);
@@ -102,24 +103,27 @@ class AuthModel {
   }
 
   static buscaCadastro(codigo, callback) {
-    const query = 'SELECT nome, id FROM usuario WHERE casal = ?';
+    const query = 'SELECT user.nome, user.id, casal.usuario_sec FROM usuario AS user INNER JOIN casal ON casal.usuario_princ = user.id WHERE casal = ?';
     connection.query(query, [codigo], (err, results) => {
       if (err) {
         return callback(err, null);
+      } else if (results.length === 0) {
+        return callback(null, 0); // Não há usuário cadastrado com esse código de vinculação
+      } else if (results[0].usuario_sec != null) {
+        return callback(null, 1);
       }
-      if (results.length === 0) {
-        return callback(null, null); // Não há usuário cadastrado com esse código de vinculação
-      }
+      console.log(results[0])
       callback(null, results[0]);
     });
   }
 
+  //Realizar uma validação de vinculação mais segura, como solicitar o email do parceiro principal
   static vincCadastro = async (nome, email, senha, cod_casal, email_parceiro, dt_criacao, id_usuario_princ, callback) => {
     const senhaHash = crypto.createHash('sha256').update(senha).digest('hex');
 
     //verificar se o email a ser vinculado é o mesmo que está cadastrado no usuário principal
     const queryParceiro = 'SELECT * FROM usuario WHERE email_parceiro = ?'
-    await new Promise((resolve, reject) => {
+    const parceiro = await new Promise((resolve, reject) => {
       connection.query(queryParceiro, [email], (err, results) => {
         if (err) {
           reject(err)
@@ -146,9 +150,9 @@ class AuthModel {
     const userId = usuarioResult.insertId;
 
     //Cria linha na tabela de casal
-    const queryCasal = 'UPDATE casal SET usuario_sec = ?';
+    const queryCasal = 'UPDATE casal SET usuario_sec = ? WHERE cod_casal = ?';
     const casalResult = await new Promise((resolve, reject) => {
-      connection.query(queryCasal, [userId], (err, results) => {
+      connection.query(queryCasal, [userId, cod_casal], (err, results) => {
         if (err) {
           reject(err);
         }

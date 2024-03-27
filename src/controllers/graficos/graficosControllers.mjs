@@ -1,9 +1,9 @@
-import filtrosGraphModel from "../../models/filtros/filtrosGraphModel.mjs";
+import graficosModel from "../../models/graficos/GraficosModels.mjs";
 
 const receitaPorCategoria = (req, res) => {
     const casal = req.header('auth');
     
-    filtrosGraphModel.receitaPorCategoria(casal, (err, results) => {
+    graficosModel.receitaPorCategoria(casal, (err, results) => {
         if(err) {
             return res.status(500).json({error: 'Não foi possível encontrar os saldos das categorias'});
         }

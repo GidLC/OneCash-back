@@ -1,6 +1,6 @@
 import { connection } from '../../config.mjs'
 
-class filtrosGraphModel {
+class graficosModel {
     static receitaPorCategoria = async (casal, callback) => {
         const queryCategoria = 'SELECT * from categoria_tr WHERE casal = ? AND tipo = 1'
         const categoriasBD = await new Promise((resolve, reject) => {
@@ -32,4 +32,4 @@ class filtrosGraphModel {
     }
 }
 
-export default filtrosGraphModel
+export default graficosModel
