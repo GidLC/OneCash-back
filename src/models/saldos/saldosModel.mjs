@@ -108,6 +108,8 @@ class SaldosModel {
 
                 const saldo = saldoInicial + receitas - despesas;
 
+                console.log({receitas, despesas})
+
                 return { ...banco, saldo };
             }));
 

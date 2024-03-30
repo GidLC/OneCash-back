@@ -37,7 +37,8 @@ class BancoModel {
                 resolve(results)
             });
         });
-
+        
+        //bancos coletivos
         const queryBancoCol = 'SELECT id, nome, tipo, saldo_inicial FROM banco where casal = ? AND tipo = 1';
         const bancosCol = await new Promise((resolve, reject) => {
             connection.query(queryBancoCol, [cod_casal, usuario], (err, results) => {
@@ -51,6 +52,7 @@ class BancoModel {
 
         const bancos = [...bancosInd, ...bancosCol]
 
+        console.log({cod_casal, usuario})
         callback(null, bancos)
     }
 
@@ -186,6 +188,16 @@ class BancoModel {
         } catch (error) {
             console.error(`Não foi possível gerar o saldo ${error}`);
             return callback(error, null);
+        }
+    }
+
+    static transfBancaria = async (casal, usuario, bancoOrigem, bancoDestino, callback) => {
+        try {
+            //No banco de origem se cria uma despesa(débito)
+            const queryDebito = 'INSERT INTO despesa(descricao, valor, usuario, casal, categoria, status, dia, mes, ano, banco, tipo) VALUES (?,?,?,?,?,?,?,?,?,?,?)'
+            //No banco destino se cria uma receita(crédito)
+        } catch (error) {
+
         }
     }
 
