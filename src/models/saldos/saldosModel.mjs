@@ -17,8 +17,9 @@ class SaldosModel {
 
             //Busca informações dos bancos
             const bancosComSaldoInd = await Promise.all(bancosBDInd.map(async (banco) => {
+                //Saldo inicial
                 const saldoInicialBD = await new Promise((resolve, reject) => {
-                    const querysaldoInicial = 'SELECT saldo_inicial FROM banco WHERE id = ? AND casal = ? AND usuario = ? AND tipo = 0';
+                    const querysaldoInicial = 'SELECT saldo_inicial FROM banco WHERE id = ? AND casal = ? AND usuario = ?';
                     connection.query(querysaldoInicial, [banco.id, casal, usuario], (err, results) => {
                         if (err) {
                             reject(err);
@@ -28,8 +29,8 @@ class SaldosModel {
                 });
 
                 const saldoInicial = saldoInicialBD[0].saldo_inicial;
-
-                const queryreceitas = 'SELECT SUM(valor) AS total_receitas FROM receita WHERE banco = ? AND casal = ? AND usuario = ? AND tipo = 0';
+                //receitas
+                const queryreceitas = 'SELECT SUM(valor) AS total_receitas FROM receita WHERE banco = ? AND casal = ? AND usuario = ?';
                 const receitasBD = await new Promise((resolve, reject) => {
                     connection.query(queryreceitas, [banco.id, casal, usuario], (err, results) => {
                         if (err) {
@@ -41,7 +42,7 @@ class SaldosModel {
 
                 const receitas = receitasBD[0].total_receitas || 0;
 
-                const queryDespesas = 'SELECT SUM(valor) AS total_despesas FROM despesa WHERE banco = ? AND casal = ? AND usuario = ? AND tipo = 0';
+                const queryDespesas = 'SELECT SUM(valor) AS total_despesas FROM despesa WHERE banco = ? AND casal = ? AND usuario = ?';
                 const despesasBD = await new Promise((resolve, reject) => {
                     connection.query(queryDespesas, [banco.id, casal, usuario], (err, results) => {
                         if (err) {
@@ -54,6 +55,7 @@ class SaldosModel {
                 const despesas = despesasBD[0].total_despesas || 0;
 
                 const saldo = saldoInicial + receitas - despesas;
+
 
                 return { ...banco, saldo};
             }));
@@ -82,7 +84,7 @@ class SaldosModel {
 
                 const saldoInicial = saldoInicialBD[0].saldo_inicial;
 
-                const queryreceitas = 'SELECT SUM(valor) AS total_receitas FROM receita WHERE banco = ? AND casal = ? AND tipo = 1';
+                const queryreceitas = 'SELECT SUM(valor) AS total_receitas FROM receita WHERE banco = ? AND casal = ?';
                 const receitasBD = await new Promise((resolve, reject) => {
                     connection.query(queryreceitas, [banco.id, casal], (err, results) => {
                         if (err) {
@@ -94,7 +96,7 @@ class SaldosModel {
 
                 const receitas = receitasBD[0].total_receitas || 0;
 
-                const queryDespesas = 'SELECT SUM(valor) AS total_despesas FROM despesa WHERE banco = ? AND casal = ? AND tipo = 1';
+                const queryDespesas = 'SELECT SUM(valor) AS total_despesas FROM despesa WHERE banco = ? AND casal = ?';
                 const despesasBD = await new Promise((resolve, reject) => {
                     connection.query(queryDespesas, [banco.id, casal], (err, results) => {
                         if (err) {
@@ -106,12 +108,14 @@ class SaldosModel {
 
                 const despesas = despesasBD[0].total_despesas || 0;
 
-                const saldo = saldoInicial + receitas - despesas;
+                const saldo = (saldoInicial + receitas) - despesas;
 
-                console.log({receitas, despesas})
+                console.log({receitasBD, despesasBD})
 
                 return { ...banco, saldo };
             }));
+
+            console.log({bancosComSaldoInd, bancosComSaldoCol})
 
             const saldoIndividual = bancosComSaldoInd.reduce((acumulador, banco) => acumulador + banco.saldo, 0)
             const saldoColetivo = bancosComSaldoCol.reduce((acumulador, banco) => acumulador + banco.saldo, 0)

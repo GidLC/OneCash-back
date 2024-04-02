@@ -1,6 +1,5 @@
 import { connection } from "../../config.mjs";
 
-
 class BancoModel {
     static addBanco = (saldo_inicial, casal, nome, tipo, usuario, callback) => {
         if (tipo == 0) {
@@ -68,9 +67,11 @@ class BancoModel {
     }
 
     static saldoBanco = async (casal, usuario, tipo, callback) => {
+        //Incluir transferências na soma dos saldos
         try {
             //Saldos individuais
             if (tipo == 0) {
+                //Seleciona todos os bancos individuais
                 const queryBancoInd = 'SELECT * FROM banco WHERE casal = ? AND usuario = ? AND tipo = 0';
                 const bancosBDInd = await new Promise((resolve, reject) => {
                     connection.query(queryBancoInd, [casal, usuario], (err, results) => {
@@ -80,9 +81,11 @@ class BancoModel {
                         resolve(results)
                     });
                 });
-                console.log(bancosBDInd)
 
+                //Realiza o cálculo dos saldos individuais
                 const bancosComSaldoInd = await Promise.all(bancosBDInd.map(async (banco) => {
+
+                    //Saldo Inicial
                     const saldoInicialBD = await new Promise((resolve, reject) => {
                         const querysaldoInicial = 'SELECT saldo_inicial FROM banco WHERE id = ? AND casal = ? AND usuario = ? AND tipo = 0';
                         connection.query(querysaldoInicial, [banco.id, casal, usuario], (err, results) => {
@@ -95,6 +98,7 @@ class BancoModel {
 
                     const saldoInicial = saldoInicialBD[0].saldo_inicial;
 
+                    //Receitas
                     const queryreceitas = 'SELECT SUM(valor) AS total_receitas FROM receita WHERE banco = ? AND casal = ? AND usuario = ?';
                     const receitasBD = await new Promise((resolve, reject) => {
                         connection.query(queryreceitas, [banco.id, casal, usuario], (err, results) => {
@@ -107,6 +111,7 @@ class BancoModel {
 
                     const receitas = receitasBD[0].total_receitas || 0;
 
+                    //Depesas
                     const queryDespesas = 'SELECT SUM(valor) AS total_despesas FROM despesa WHERE banco = ? AND casal = ? AND usuario = ?';
                     const despesasBD = await new Promise((resolve, reject) => {
                         connection.query(queryDespesas, [banco.id, casal, usuario], (err, results) => {
@@ -190,17 +195,6 @@ class BancoModel {
             return callback(error, null);
         }
     }
-
-    static transfBancaria = async (casal, usuario, bancoOrigem, bancoDestino, callback) => {
-        try {
-            //No banco de origem se cria uma despesa(débito)
-            const queryDebito = 'INSERT INTO despesa(descricao, valor, usuario, casal, categoria, status, dia, mes, ano, banco, tipo) VALUES (?,?,?,?,?,?,?,?,?,?,?)'
-            //No banco destino se cria uma receita(crédito)
-        } catch (error) {
-
-        }
-    }
-
 }
 
 export default BancoModel

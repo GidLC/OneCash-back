@@ -1,5 +1,4 @@
-import ReceitaModel from "../../models/transacao/receitaModel.mjs";
-
+import ReceitaModel from "../../models/transacoes/receitaModel.mjs";
 
 const addReceita = (req, res) => {
   const { descricao, valor, categoria, status, data, banco } = req.body;

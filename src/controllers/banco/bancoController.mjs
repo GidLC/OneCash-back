@@ -60,5 +60,4 @@ const saldoBanco = (req, res) => {
     })
 }
 
-
-export default { addBanco, readBanco, readBancoID, saldoBanco }
+export default { addBanco, readBanco, readBancoID, saldoBanco}

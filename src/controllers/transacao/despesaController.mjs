@@ -1,4 +1,4 @@
-import DespesaModel from "../../models/transacao/despesaModel.mjs";
+import DespesaModel from "../../models/transacoes/despesaModel.mjs";
 
 const addDespesa = (req, res) => {
     const { descricao, valor, categoria, status, data, banco, tipo } = req.body;

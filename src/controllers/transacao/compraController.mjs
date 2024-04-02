@@ -1,4 +1,4 @@
-import compraModel from "../../models/transacao/compraModel.mjs";
+import compraModel from "../../models/transacoes/compraModel.mjs";
 
 const buscaNF = (req, res) => {
     const url = req.header('url');
