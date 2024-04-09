@@ -60,4 +60,18 @@ const saldoBanco = (req, res) => {
     })
 }
 
-export default { addBanco, readBanco, readBancoID, saldoBanco}
+const alteraSaldoInicial = (req, res) => {
+    const casal = req.header('auth');
+    const id = req.header('id')
+    const novoSaldo = req.header('novoSaldo')
+
+    BancoModel.alteraSaldoincial(id, casal, novoSaldo, (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: 'Não foi possível ajustar saldo inicial' });
+        }
+
+        res.status(200).json({ message: 'Saldo ajustado com sucesso', results });
+    })
+}
+
+export default { addBanco, readBanco, readBancoID, saldoBanco, alteraSaldoInicial}

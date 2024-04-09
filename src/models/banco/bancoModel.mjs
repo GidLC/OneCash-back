@@ -36,7 +36,7 @@ class BancoModel {
                 resolve(results)
             });
         });
-        
+
         //bancos coletivos
         const queryBancoCol = 'SELECT id, nome, tipo, saldo_inicial FROM banco where casal = ? AND tipo = 1';
         const bancosCol = await new Promise((resolve, reject) => {
@@ -51,7 +51,7 @@ class BancoModel {
 
         const bancos = [...bancosInd, ...bancosCol]
 
-        console.log({cod_casal, usuario})
+        console.log({ cod_casal, usuario })
         callback(null, bancos)
     }
 
@@ -124,7 +124,33 @@ class BancoModel {
 
                     const despesas = despesasBD[0].total_despesas || 0;
 
-                    const saldo = saldoInicial + receitas - despesas;
+                    //Transferências de saída
+                    const queryTransfDeb = 'SELECT SUM(valor) AS total_transf_deb FROM transferencias WHERE banco_origem = ? AND casal = ? AND usuario = ? AND tipo = 0';
+                    const transfDebBD = await new Promise((resolve, reject) => {
+                        connection.query(queryTransfDeb, [banco.id, casal, usuario], (err, results) => {
+                            if (err) {
+                                reject(err);
+                            }
+                            resolve(results);
+                        });
+                    });
+
+                    const transfDeb = transfDebBD[0].total_transf_deb || 0
+
+                    //Transferências de entrada
+                    const queryTransfCred = 'SELECT SUM(valor) AS total_transf_deb FROM transferencias WHERE banco_origem = ? AND casal = ? AND usuario = ? AND tipo = 1';
+                    const transfCredBD = await new Promise((resolve, reject) => {
+                        connection.query(queryTransfCred, [banco.id, casal, usuario], (err, results) => {
+                            if (err) {
+                                reject(err);
+                            }
+                            resolve(results);
+                        });
+                    });
+
+                    const transfCred = transfCredBD[0].total_transf_deb || 0
+
+                    const saldo = (saldoInicial + receitas + transfCred) - (despesas + transfDeb);
 
                     return { ...banco, saldo, saldoInicial };
                 }));
@@ -182,7 +208,33 @@ class BancoModel {
 
                     const despesas = despesasBD[0].total_despesas || 0;
 
-                    const saldo = saldoInicial + receitas - despesas;
+                    //Transferências de saída
+                    const queryTransfDeb = 'SELECT SUM(valor) AS total_transf_deb FROM transferencias WHERE banco_origem = ? AND casal = ? AND tipo = 0';
+                    const transfDebBD = await new Promise((resolve, reject) => {
+                        connection.query(queryTransfDeb, [banco.id, casal], (err, results) => {
+                            if (err) {
+                                reject(err);
+                            }
+                            resolve(results);
+                        });
+                    });
+
+                    const transfDeb = transfDebBD[0].total_transf_deb || 0
+
+                    //Transferências de entrada
+                    const queryTransfCred = 'SELECT SUM(valor) AS total_transf_cred FROM transferencias WHERE banco_origem = ? AND casal = ? AND tipo = 1';
+                    const transfCredBD = await new Promise((resolve, reject) => {
+                        connection.query(queryTransfCred, [banco.id, casal], (err, results) => {
+                            if (err) {
+                                reject(err);
+                            }
+                            resolve(results);
+                        });
+                    });
+
+                    const transfCred = transfCredBD[0].total_transf_cred || 0
+
+                    const saldo = (saldoInicial + receitas + transfCred) - (despesas + transfDeb);
 
                     return { ...banco, saldo, saldoInicial };
                 }));
@@ -192,6 +244,22 @@ class BancoModel {
 
         } catch (error) {
             console.error(`Não foi possível gerar o saldo ${error}`);
+            return callback(error, null);
+        }
+    }
+
+    static alteraSaldoincial = async (id, casal, novoSaldo, callback) => {
+        try {
+            const query = 'UPDATE banco SET saldo_inicial = ? WHERE id = ? AND casal = ?'
+            connection.query(query, [novoSaldo, id, casal], (err, results) => {
+                if (err) {
+                    return callback(err, null)
+                }
+
+                return callback(null, results)
+            })
+        } catch (error) {
+            console.error(`Não foi possível alterar o saldo inicial: ${error}`);
             return callback(error, null);
         }
     }

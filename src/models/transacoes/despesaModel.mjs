@@ -19,7 +19,7 @@ class DespesaModel {
         if (tipo == 0) {
             console.log({ usuario, casal, mes, ano, tipo })
             const query = `SELECT des.id, des.descricao, des.valor, cat.nome AS nome_categoria, 
-            ic.ion_nome AS nome_icone, cor.codigo AS cod_cor, ba.nome AS nome_banco FROM despesa as des
+            ic.ion_nome AS nome_icone, cor.codigo AS cod_cor, ba.nome AS nome_banco, cat.tipo AS tipo_categoria FROM despesa as des
                 INNER JOIN categoria_tr AS cat ON cat.id = des.categoria
                 INNER JOIN icones AS ic ON ic.id = cat.icone
                 INNER JOIN cor ON cor.id = cat.cor
@@ -36,7 +36,7 @@ class DespesaModel {
         } else if (tipo == 1) {
             console.log({ casal, mes, ano, tipo })
             const query = `SELECT des.id, des.descricao, des.valor, cat.nome AS nome_categoria, 
-            ic.ion_nome AS nome_icone, cor.codigo AS cod_cor, ba.nome AS nome_banco FROM despesa as des
+            ic.ion_nome AS nome_icone, cor.codigo AS cod_cor, ba.nome AS nome_banco, cat.tipo AS tipo_categoria FROM despesa as des
                 INNER JOIN categoria_tr AS cat ON cat.id = des.categoria
                 INNER JOIN icones AS ic ON ic.id = cat.icone
                 INNER JOIN cor ON cor.id = cat.cor

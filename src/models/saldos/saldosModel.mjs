@@ -54,7 +54,33 @@ class SaldosModel {
 
                 const despesas = despesasBD[0].total_despesas || 0;
 
-                const saldo = saldoInicial + receitas - despesas;
+                //Transferências de saída
+                const queryTransfDeb = 'SELECT SUM(valor) AS total_transf_deb FROM transferencias WHERE banco_origem = ? AND casal = ? AND usuario = ? AND tipo = 0';
+                const transfDebBD = await new Promise((resolve, reject) => {
+                    connection.query(queryTransfDeb, [banco.id, casal, usuario], (err, results) => {
+                        if (err) {
+                            reject(err);
+                        }
+                        resolve(results);
+                    });
+                });
+
+                const transfDeb = transfDebBD[0].total_transf_deb || 0
+
+                //Transferências de entrada
+                const queryTransfCred = 'SELECT SUM(valor) AS total_transf_cred FROM transferencias WHERE banco_origem = ? AND casal = ? AND usuario = ? AND tipo = 1';
+                const transfCredBD = await new Promise((resolve, reject) => {
+                    connection.query(queryTransfCred, [banco.id, casal, usuario], (err, results) => {
+                        if (err) {
+                            reject(err);
+                        }
+                        resolve(results);
+                    });
+                });
+
+                const transfCred = transfCredBD[0].total_transf_cred || 0
+
+                const saldo = (saldoInicial + receitas + transfCred) - (despesas + transfDeb);
 
 
                 return { ...banco, saldo};
@@ -108,9 +134,33 @@ class SaldosModel {
 
                 const despesas = despesasBD[0].total_despesas || 0;
 
-                const saldo = (saldoInicial + receitas) - despesas;
+                //Transferências de saída
+                const queryTransfDeb = 'SELECT SUM(valor) AS total_transf_deb FROM transferencias WHERE banco_origem = ? AND casal = ? AND tipo = 0';
+                const transfDebBD = await new Promise((resolve, reject) => {
+                    connection.query(queryTransfDeb, [banco.id, casal], (err, results) => {
+                        if (err) {
+                            reject(err);
+                        }
+                        resolve(results);
+                    });
+                });
 
-                console.log({receitasBD, despesasBD})
+                const transfDeb = transfDebBD[0].total_transf_deb || 0
+
+                //Transferências de entrada
+                const queryTransfCred = 'SELECT SUM(valor) AS total_transf_cred FROM transferencias WHERE banco_origem = ? AND casal = ? AND tipo = 1';
+                const transfCredBD = await new Promise((resolve, reject) => {
+                    connection.query(queryTransfCred, [banco.id, casal], (err, results) => {
+                        if (err) {
+                            reject(err);
+                        }
+                        resolve(results);
+                    });
+                });
+
+                const transfCred = transfCredBD[0].total_transf_cred || 0
+
+                const saldo = (saldoInicial + receitas + transfCred) - (despesas + transfDeb);
 
                 return { ...banco, saldo };
             }));
