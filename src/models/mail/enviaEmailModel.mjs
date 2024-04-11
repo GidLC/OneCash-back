@@ -1,4 +1,6 @@
 import nodemailer from 'nodemailer'
+import enviaEmail from '../../data/enviaEmail/enviaEmail.mjs'
+import EmailCadastro from '../../data/emails/Cadastro/EmailCadastro.mjs'
 
 const adminMail = "dionisio_roberval@hotmail.com"
 const adminPass = "Didi@@123"
@@ -7,9 +9,9 @@ const mailPort = 587
 
 class enviaEmailModel {
     static enviaEmail = async (destinatario, assunto, conteudo, callback) => {
-        console.log(destinatario)
+        await enviaEmail(destinatario, "E-mail teste", EmailCadastro("Gideone", "df56ed"))
         try {
-            const transpoter = nodemailer.createTransport({
+            /*const transpoter = nodemailer.createTransport({
                 host: mailHost,
                 port: mailPort,
                 secure: false,
@@ -24,11 +26,11 @@ class enviaEmailModel {
                 to: destinatario,
                 subject: assunto,
                 html: conteudo
-            }
+            }*/
     
-            return callback(null, transpoter.sendMail(options))
+            return callback(null, 'OK')
         } catch (error) {
-            return callback(`Houve um erro no envio do e-mail, ${error}`, null)
+            //return callback(`Houve um erro no envio do e-mail, ${error}`, null)
         }
     }
 }

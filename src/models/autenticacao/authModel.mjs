@@ -1,7 +1,8 @@
-// produtoModel.js
 import { connection } from "../../config.mjs";
 import * as crypto from 'crypto'
 import enviaEmail from "../../data/enviaEmail/enviaEmail.mjs";
+import EmailParceiro from "../../data/emails/Cadastro/EmailParceiro.mjs";
+import EmailCadastro from "../../data/emails/Cadastro/EmailCadastro.mjs";
 
 class AuthModel {
 
@@ -22,14 +23,12 @@ class AuthModel {
 
         await enviaEmail(email,
           "Cadastro no OneCash",
-          `Você acaba de se cadastrar no OneCash, o melhor aplicativo de finanças familiar. O código casal seu e de seu(sua) parceiro(a) é o ${codigoCasal}. 
-            Seu parceiro(a) vai precisar dele para se vincular a você, mas não se preocupe já enviamos pra ele(a) também`);
+          EmailCadastro(nome, codigoCasal)
+          );
 
         await enviaEmail(email_parceiro,
           "Cadastro no OneCash",
-          `${nome} acaba de se cadastrar no aplicativo OneCash e te colocou como parceiro dele. 
-            Seu código para se vincular a ele e criar o casal de vocês em nosso aplicativo é ${codigoCasal}.
-            Para se vincular basta baixar nosso aplicativo e ir em CADASTRE-SE - ATRIBUIÇÃO. Coloque lá o código recebido e realize o cadastro de sua própria conta.`)
+          EmailParceiro(nome, codigoCasal))
 
         resolve(results)
       });
