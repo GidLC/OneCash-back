@@ -11,6 +11,7 @@ import receitaRouter from './routes/transacao/receitaRoutes.mjs';
 import graficosRouter from './routes/graficos/GraficosRoutes.mjs';
 import saldosRouter from './routes/saldos/saldosRoutes.mjs';
 import transfRouter from './routes/transacao/transferenciaRoutes.mjs';
+import objetivoRouter from './routes/objetivos/objetivosRoutes.mjs';
 
 app.use('/api/auth', authRouter) //autenticação (login, vinculação, cadastro, esqueci a senha)
 app.use('/api/receita', receitaRouter) // gerencia receita
@@ -23,6 +24,7 @@ app.use('/api/graph', graficosRouter) //Busca dados para gráficos
 app.use('/api/email', enviaEmailRouter) //Envia emails a partir do front-end
 app.use('/api/saldos', saldosRouter) // Retorna saldos
 app.use('/api/transf', transfRouter) // Gerencia transferências bancárias
+app.use('/api/objetivos', objetivoRouter) // Gerencia Objetivos
 
 const PORT = process.env.PORT || 8050;
 
