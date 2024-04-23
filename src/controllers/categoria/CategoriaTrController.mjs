@@ -10,7 +10,7 @@ const addCategoriaTr = (req, res) => {
             return res.status(500).json({ error: 'Erro ao cadastrar categoria' });
         }
 
-        res.status(200).json({ messagem: 'Categoria Cadastrada com Sucesso', results })
+        res.status(200).json({ message: 'Categoria Cadastrada com Sucesso', results })
     })
 }
 
@@ -24,7 +24,7 @@ const loadCategoriaTr = (req, res) => {
             return res.status(500).json({ error: 'Não possível encontrar as categorias', results })
         }
 
-        res.status(200).json({ messagem: 'Categoria Encontradas com Sucesso', results })
+        res.status(200).json({ message: 'Categoria Encontradas com Sucesso', results })
     })
 }
 
@@ -38,7 +38,7 @@ const loadCategoriaTrID = (req, res) => {
             return res.status(500).json({ error: 'Não foi possível carregar a categoria em questão', results })
         }
 
-        res.status(200).json({ messagem: 'Categoria Encontrada com Sucesso', results })
+        res.status(200).json({ message: 'Categoria Encontrada com Sucesso', results })
     })
 }
 
@@ -52,7 +52,7 @@ const editCategoriaTr = (req, res) => {
             return res.status(500).json({ error: 'Não foi possível editar essa Categoria', results })
         }
 
-        res.status(200).json({ messagem: 'Categoria Editada com Sucesso', results })
+        res.status(200).json({ message: 'Categoria Editada com Sucesso', results })
     })
 }
 
@@ -63,11 +63,14 @@ const deleteCategoriaTr = (req, res) => {
 
     CategoriaTrModel.deleteCategoriaTr(auth, id, (err, results) => {
         if(err) {
-            console.error('Não foi possível exculir essa categoria', err);
-            return res.status(500).json({error: 'Não foi possível exculir essa categoria', results})
+            if(err.sqlState == 23000) {
+                return res.status(501).json({error: 'Essa categoria já possui movimentações, não é possível exlui-la', status: 501})
+            }
+            console.error('Não foi possível excluir essa categoria', err);
+            return res.status(500).json({error: 'Não foi possível excluir essa categoria', results})
         }
 
-        res.status(200).json({ messagem: 'Categoria Excluida com Sucesso', results })
+        res.status(200).json({ message: 'Categoria Excluida com Sucesso', results })
     })
 }
 

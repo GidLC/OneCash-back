@@ -51,16 +51,26 @@ class CategoriaTrModel {
         })
     }
 
+    //Só se utiliza esse delete caso a categoria não tenha movimentações atribuidas a ela
     static deleteCategoriaTr = (auth, id, callback) => {
-        console.log(`Auth: ${auth}, id: ${id}`)
         const query = 'DELETE FROM categoria_tr WHERE id = ? AND casal = ?';
         connection.query(query, [id, auth], (err, results) => {
             if (err) {
                 return callback(err, null)
             }
+            //console.log(results)
 
             return callback(null, results)
         })
+    }
+
+
+    //Mover movimentações para outra categoria
+    static moveTransacoes = async (auth, catOrigem, catDestino, callback) => {
+        //receitas
+        const query = 'UPDATE receita SET categoria = ? WHERE categoria = ?'
+
+
     }
 }
 

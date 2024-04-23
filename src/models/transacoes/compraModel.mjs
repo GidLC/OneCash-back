@@ -14,20 +14,44 @@ class compraModel {
             }
 
             const html = await response.text();
-            //console.log(html); // Aqui você tem o HTML da página
             extrairDados(html);
         } catch (error) {
             console.error(`Ocorreu um erro: ${error}`);
             return null;
         }
 
-        function extrairDados(html) {
+        async function extrairDados(html) {
             const $ = cheerio.load(html);
             const itens = [];
 
             // Extrai informações gerais da nota
-            const estabelecimento = $('div#conteudo div.txtCenter div#u20').text().trim();
+            const cnpjTexto = $('div#conteudo div.text').text().trim();
             const totalNota = $('div#conteudo div#totalNota span.totalNumb.txtMax').text().trim();
+
+            const regexCNPJ = /(?:\bCNPJ:\s*)?(\d{2})\.?(\d{3})\.?(\d{3})\/?(\d{4})-?(\d{2})/;
+            const matchCNPJ = cnpjTexto.match(regexCNPJ);
+            const cnpj = matchCNPJ.slice(1, 6).join('')
+
+            const buscaFantasia = async (cnpj) => {
+                if (cnpj) {
+                    try {
+                        const responseEstabelecimento = await fetch(`https://www.receitaws.com.br/v1/cnpj/${cnpj}`, {
+                            method: 'GET',
+                            'Content-Type': 'application/json',
+                        });
+
+                        if (!responseEstabelecimento.ok) {
+                            throw new Error(`Falha ao buscar dados na Receita: ${responseEstabelecimento.status}`);
+                        }
+
+                        return responseEstabelecimento.json();
+                    } catch (error) {
+                        console.error("Erro ao buscar dados na receita:", error);
+                    }
+                }
+            }
+
+            const estabelecimento = await buscaFantasia(cnpj)
 
             // Extrai informações de cada item da nota
             $('table#tabResult tr[id^="Item"]').each((index, element) => {
@@ -46,12 +70,13 @@ class compraModel {
 
             // Cria o objeto JSON com os dados extraídos
             const dadosNota = {
-                Estabelecimento: estabelecimento,
+                Estabelecimento: estabelecimento.fantasia,
+                cnpj: cnpj,
                 TotalNota: totalNota,
                 Itens: itens,
             };
 
-            console.log(dadosNota)
+            //console.log(dadosNota)
             callback(null, dadosNota)
         }
     }

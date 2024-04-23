@@ -12,6 +12,30 @@ class ObjetivoModel {
             return callback(null, results)
         })
     }
+
+    static readObjetivos = (casal, callback) => {
+        const query = 'SELECT * FROM objetivo WHERE casal = ?';
+
+        connection.query(query, [casal], (err, results) => {
+            if (err) {
+                return callback(err, null)
+            }
+
+            return callback(null, results)
+        })
+    }
+
+    static deleteObjetivo = (id, casal, callback) => {
+        const query = 'DELETE FROM objetivo WHERE id = ? AND casal = ?';
+
+        connection.query(query, [id, casal], (err, results) => {
+            if (err) {
+                return callback(err, null)
+            }
+
+            return callback(null, results)
+        })
+    }
 }
 
 export default ObjetivoModel
