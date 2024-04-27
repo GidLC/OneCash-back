@@ -56,10 +56,12 @@ class AuthModel {
     INSERT INTO categoria_tr (nome, tipo, cor, icone, casal) VALUES("Roupas e Acessórios", 0, 8, 33, ?);
     INSERT INTO categoria_tr (nome, tipo, cor, icone, casal) VALUES("Água/Luz/Internet", 0, 9, 39, ?);
     INSERT INTO categoria_tr (nome, tipo, cor, icone, casal) VALUES("Despesas Diversas", 0, 10, 36, ?);
+    INSERT INTO categoria_tr (nome, tipo, cor, icone, casal) VALUES("*Ajuste*",0, 2, 36, ?);
     INSERT INTO categoria_tr (nome, tipo, cor, icone, casal) VALUES("Salário", 1, 11, 38, ?);
     INSERT INTO categoria_tr (nome, tipo, cor, icone, casal) VALUES("Rendimentos", 1, 12, 37, ?);
     INSERT INTO categoria_tr (nome, tipo, cor, icone, casal) VALUES("Presentes", 1, 13, 26, ?);
     INSERT INTO categoria_tr (nome, tipo, cor, icone, casal) VALUES("Vales", 1, 14, 31, ?);
+    INSERT INTO categoria_tr (nome, tipo, cor, icone, casal) VALUES("*Ajuste*",1, 3, 37, ?);
     `;
 
     try {

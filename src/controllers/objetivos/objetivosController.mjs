@@ -16,8 +16,9 @@ const addObjetivo = (req, res) => {
 
 const readObjetivos = (req, res) => {
     const casal = req.header('auth')
+    const status = req.header('status')
 
-    ObjetivoModel.readObjetivos(casal, (err, results) => {
+    ObjetivoModel.readObjetivos(casal, status, (err, results) => {
         if (err) {
             console.error('Erro ao obter objetivos')
             return res.status(500).json({error: 'Não foi possível obter os objetivos'})

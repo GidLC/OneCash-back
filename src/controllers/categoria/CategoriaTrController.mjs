@@ -28,6 +28,19 @@ const loadCategoriaTr = (req, res) => {
     })
 }
 
+const loadCategoriasSistema = (req, res) => {
+    const auth = req.header('auth')
+
+    CategoriaTrModel.loadCategoriasSistema(auth, (err, results) => {
+        if (err) {
+            console.error('Não foi possível encontrar as categorias', err);
+            return res.status(500).json({ error: 'Não possível encontrar as categorias', results })
+        }
+
+        res.status(200).json({message: 'Categorias encontradas', results})
+    })
+}
+
 const loadCategoriaTrID = (req, res) => {
     const auth = req.header('auth');
     const { id } = req.body;
@@ -74,4 +87,15 @@ const deleteCategoriaTr = (req, res) => {
     })
 }
 
-export default { addCategoriaTr, loadCategoriaTr, loadCategoriaTrID, editCategoriaTr, deleteCategoriaTr }
+const moveTransacoes = (req, res) => {
+    const auth = req.header('auth')
+    const {catOrigem, catDestino} = req.body
+    CategoriaTrModel.moveTransacoes(auth, catOrigem, catDestino, (err, results) => {
+        if (err) {
+            return res.status(500).json({error: 'Não foi possível mover as transações'})
+        }
+        return res.status(200).json({message: 'Transações movidas com sucesso', results})
+    })
+}
+
+export default { addCategoriaTr, loadCategoriaTr, loadCategoriasSistema, loadCategoriaTrID, editCategoriaTr, deleteCategoriaTr, moveTransacoes }
