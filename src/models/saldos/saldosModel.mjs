@@ -5,7 +5,7 @@ class SaldosModel {
         try {
             //Saldos individuais
             //seleciona todos os bancos
-            const queryBancoInd = 'SELECT * FROM banco WHERE casal = ? AND usuario = ? AND tipo = 0';
+            const queryBancoInd = 'SELECT * FROM banco WHERE casal = ? AND usuario = ? AND tipo = 0 AND arquivo = 0';
             const bancosBDInd = await new Promise((resolve, reject) => {
                 connection.query(queryBancoInd, [casal, usuario], (err, results) => {
                     if (err) {
@@ -87,7 +87,7 @@ class SaldosModel {
             }));
 
             //Saldos conjuntos
-            const queryBancoCol = 'SELECT * FROM banco WHERE casal = ? AND tipo = 1';
+            const queryBancoCol = 'SELECT * FROM banco WHERE casal = ? AND tipo = 1 AND arquivo = 0';
             const bancosBDCol = await new Promise((resolve, reject) => {
                 connection.query(queryBancoCol, [casal], (err, results) => {
                     if (err) {

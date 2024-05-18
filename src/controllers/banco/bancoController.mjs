@@ -74,4 +74,18 @@ const alteraSaldoInicial = (req, res) => {
     })
 }
 
-export default { addBanco, readBanco, readBancoID, saldoBanco, alteraSaldoInicial}
+const arqDesBanco = (req, res) => {
+    const casal = req.header('auth')
+    const id = req.header('id')
+    const arquivo = req.header('arquivo')
+
+    BancoModel.arqDesBanco(id, casal, arquivo, (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: 'Não foi possível realizar essa alteração' });
+        }
+
+        res.status(200).json({ message: 'Alteração realizada com sucesso', results });
+    })
+}
+
+export default { addBanco, readBanco, readBancoID, saldoBanco, alteraSaldoInicial, arqDesBanco}

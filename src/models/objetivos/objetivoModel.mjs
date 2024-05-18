@@ -43,6 +43,17 @@ class ObjetivoModel {
     static readObjetivoID = (id, casal, callback) => {
         const query = 'SELECT id, descricao, valor_final, valor_inicial, prazo'
     }
+
+    static aporteValor = (id, valor, callback) => {
+        const query = 'INSERT INTO aporte_objetivo (valor, objetivo) VALUES (?,?)'
+
+        connection.query(query, [valor, id], (err, results) => {
+            if (err) {
+                return callback(err, null)
+            }
+            return callback(null, results)
+        })
+    }
 }
 
 export default ObjetivoModel

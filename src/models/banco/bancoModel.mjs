@@ -26,7 +26,7 @@ class BancoModel {
 
     static readBanco = async (cod_casal, usuario, callback) => {
         //bancos individuais
-        const queryBancoInd = 'SELECT id, nome, tipo, saldo_inicial FROM banco where casal = ? AND usuario = ? AND tipo = 0';
+        const queryBancoInd = 'SELECT id, nome, tipo, saldo_inicial FROM banco where casal = ? AND usuario = ? AND tipo = 0 AND arquivo = 0';
         const bancosInd = await new Promise((resolve, reject) => {
             connection.query(queryBancoInd, [cod_casal, usuario], (err, results) => {
                 if (err) {
@@ -38,7 +38,7 @@ class BancoModel {
         });
 
         //bancos coletivos
-        const queryBancoCol = 'SELECT id, nome, tipo, saldo_inicial FROM banco where casal = ? AND tipo = 1';
+        const queryBancoCol = 'SELECT id, nome, tipo, saldo_inicial FROM banco where casal = ? AND tipo = 1 AND arquivo = 0';
         const bancosCol = await new Promise((resolve, reject) => {
             connection.query(queryBancoCol, [cod_casal, usuario], (err, results) => {
                 if (err) {
@@ -72,7 +72,7 @@ class BancoModel {
             //Saldos individuais
             if (tipo == 0) {
                 //Seleciona todos os bancos individuais
-                const queryBancoInd = 'SELECT * FROM banco WHERE casal = ? AND usuario = ? AND tipo = 0';
+                const queryBancoInd = 'SELECT * FROM banco WHERE casal = ? AND usuario = ? AND tipo = 0 AND arquivo = 0';
                 const bancosBDInd = await new Promise((resolve, reject) => {
                     connection.query(queryBancoInd, [casal, usuario], (err, results) => {
                         if (err) {
@@ -160,7 +160,7 @@ class BancoModel {
                 //Saldos conjuntos
             } else if (tipo == 1) {
 
-                const queryBanco = 'SELECT * FROM banco WHERE casal = ? AND tipo = 1';
+                const queryBanco = 'SELECT * FROM banco WHERE casal = ? AND tipo = 1 AND arquivo = 0';
                 const bancosBD = await new Promise((resolve, reject) => {
                     connection.query(queryBanco, [casal], (err, results) => {
                         if (err) {
@@ -260,6 +260,22 @@ class BancoModel {
             })
         } catch (error) {
             console.error(`Não foi possível alterar o saldo inicial: ${error}`);
+            return callback(error, null);
+        }
+    }
+
+    static arqDesBanco = async (id, casal, arquivo, callback) => {
+        try {
+            const query = 'UPDATE banco SET arquivo = ? WHERE id = ? AND casal = ?'
+            connection.query(query, [arquivo, id, casal], (err, results) => {
+                if (err) {
+                    return callback(err, null)
+                }
+
+                return callback(null, results)
+            })
+        } catch (error) {
+            console.error(`Não foi possível realizar essa alteração: ${error}`);
             return callback(error, null);
         }
     }
