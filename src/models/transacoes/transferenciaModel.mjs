@@ -46,7 +46,7 @@ class TransfModel {
 
     static readTransferencias = async (usuario, casal, mes, ano, callback) => {
         try {
-            const query = `SELECT tr.id, tr.descricao, tr.valor, tr.tipo AS tipoTransf, origem.nome AS origem_nome, destino.nome AS destino_nome, tr.relacao FROM transferencias AS tr 
+            const query = `SELECT tr.id, tr.descricao, tr.valor, tr.tipo AS tipoTransf, tr.dia, tr.mes, tr.ano, origem.nome AS origem_nome, destino.nome AS destino_nome, tr.relacao FROM transferencias AS tr 
                                 INNER JOIN banco origem ON tr.banco_origem = origem.id
                                 INNER JOIN banco destino ON tr.banco_destino = destino.id
                                     WHERE tr.usuario = ? AND tr.casal = ? AND tr.mes = ? AND tr.ano = ?`

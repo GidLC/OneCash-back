@@ -77,7 +77,7 @@ const deleteCategoriaTr = (req, res) => {
     CategoriaTrModel.deleteCategoriaTr(auth, id, (err, results) => {
         if(err) {
             if(err.sqlState == 23000) {
-                return res.status(501).json({error: 'Essa categoria já possui movimentações, não é possível exlui-la', status: 501})
+                return res.status(501).json({error: 'Essa categoria já possui movimentações, não é possível exclui-la', status: 501})
             }
             console.error('Não foi possível excluir essa categoria', err);
             return res.status(500).json({error: 'Não foi possível excluir essa categoria', results})

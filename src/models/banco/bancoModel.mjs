@@ -24,11 +24,11 @@ class BancoModel {
 
     }
 
-    static readBanco = async (cod_casal, usuario, callback) => {
+    static readBanco = async (cod_casal, usuario, arquivo, callback) => {
         //bancos individuais
-        const queryBancoInd = 'SELECT id, nome, tipo, saldo_inicial FROM banco where casal = ? AND usuario = ? AND tipo = 0 AND arquivo = 0';
+        const queryBancoInd = 'SELECT id, nome, tipo, saldo_inicial FROM banco where casal = ? AND usuario = ? AND tipo = 0 AND arquivo = ?';
         const bancosInd = await new Promise((resolve, reject) => {
-            connection.query(queryBancoInd, [cod_casal, usuario], (err, results) => {
+            connection.query(queryBancoInd, [cod_casal, usuario, arquivo], (err, results) => {
                 if (err) {
                     reject(err)
                 }
@@ -38,9 +38,9 @@ class BancoModel {
         });
 
         //bancos coletivos
-        const queryBancoCol = 'SELECT id, nome, tipo, saldo_inicial FROM banco where casal = ? AND tipo = 1 AND arquivo = 0';
+        const queryBancoCol = 'SELECT id, nome, tipo, saldo_inicial FROM banco where casal = ? AND tipo = 1 AND arquivo = ?';
         const bancosCol = await new Promise((resolve, reject) => {
-            connection.query(queryBancoCol, [cod_casal, usuario], (err, results) => {
+            connection.query(queryBancoCol, [cod_casal, usuario, arquivo], (err, results) => {
                 if (err) {
                     reject(err)
                 }
@@ -66,15 +66,15 @@ class BancoModel {
         });
     }
 
-    static saldoBanco = async (casal, usuario, tipo, callback) => {
+    static saldoBanco = async (casal, usuario, tipo, arquivo, callback) => {
         //Incluir transferências na soma dos saldos
         try {
             //Saldos individuais
             if (tipo == 0) {
                 //Seleciona todos os bancos individuais
-                const queryBancoInd = 'SELECT * FROM banco WHERE casal = ? AND usuario = ? AND tipo = 0 AND arquivo = 0';
+                const queryBancoInd = 'SELECT * FROM banco WHERE casal = ? AND usuario = ? AND tipo = 0 AND arquivo = ?';
                 const bancosBDInd = await new Promise((resolve, reject) => {
-                    connection.query(queryBancoInd, [casal, usuario], (err, results) => {
+                    connection.query(queryBancoInd, [casal, usuario, arquivo], (err, results) => {
                         if (err) {
                             reject(err)
                         }
@@ -160,9 +160,9 @@ class BancoModel {
                 //Saldos conjuntos
             } else if (tipo == 1) {
 
-                const queryBanco = 'SELECT * FROM banco WHERE casal = ? AND tipo = 1 AND arquivo = 0';
+                const queryBanco = 'SELECT * FROM banco WHERE casal = ? AND tipo = 1 AND arquivo = ?';
                 const bancosBD = await new Promise((resolve, reject) => {
-                    connection.query(queryBanco, [casal], (err, results) => {
+                    connection.query(queryBanco, [casal, arquivo], (err, results) => {
                         if (err) {
                             reject(err)
                         }

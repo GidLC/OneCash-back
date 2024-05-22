@@ -16,14 +16,16 @@ const addBanco = (req, res) => {
 };
 
 const readBanco = (req, res) => {
-    const cod_casal = req.header('auth');
-    const usuario = req.header('usuario');
-    BancoModel.readBanco(cod_casal, usuario, (err, results) => {
+    const cod_casal = req.header('auth')
+    const usuario = req.header('usuario')
+    const arquivo = req.header('arquivo')
+
+    BancoModel.readBanco(cod_casal, usuario, arquivo, (err, results) => {
         if(err) {
             return res.status(500).json({error: 'Erro ao encontrar bancos'});
         } else if(results.length == 0) {
             console.log(cod_casal, usuario)
-            return res.status(500).json({error: 'Erro ao encontrar banco'});
+            return res.status(500).json({error: 'Não há bancos para serem listados'});
         }
         console.log(cod_casal, usuario)
 
@@ -47,11 +49,12 @@ const readBancoID = (req, res) => {
 };
 
 const saldoBanco = (req, res) => {
-    const casal = req.header('auth');
-    const usuario = req.header('usuario');
+    const casal = req.header('auth')
+    const usuario = req.header('usuario')
     const tipo = req.header('tipo')
+    const arquivo = req.header('arquivo')
 
-    BancoModel.saldoBanco(casal, usuario, tipo, (err, results) => {
+    BancoModel.saldoBanco(casal, usuario, tipo, arquivo, (err, results) => {
         if (err) {
             return res.status(500).json({ error: 'Erro ao encontrar o saldo do banco' });
         }
