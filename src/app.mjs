@@ -26,7 +26,7 @@ app.use('/api/saldos', saldosRouter) // Retorna saldos
 app.use('/api/transf', transfRouter) // Gerencia transferências bancárias
 app.use('/api/objetivos', objetivoRouter) // Gerencia Objetivos
 
-const PORT = process.env.PORT || 8050;
+const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
   console.log(`Servidor Node.js em execução na porta ${PORT}`);

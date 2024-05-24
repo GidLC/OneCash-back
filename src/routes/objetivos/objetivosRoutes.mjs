@@ -5,5 +5,8 @@ import objetivosController from '../../controllers/objetivos/objetivosController
 objetivoRouter.post('/addObjetivo', objetivosController.addObjetivo)
 objetivoRouter.get('/readObjetivos', objetivosController.readObjetivos)
 objetivoRouter.delete('/deleteObjetivo', objetivosController.deleteObjetivo)
+objetivoRouter.post('/aporteObjetivo', objetivosController.aporteObjetivo)
+objetivoRouter.get('/readAportes', objetivosController.readAportes)
+objetivoRouter.put('/mudaStatusObj', objetivosController.mudaStatusObjetivo)
 
 export default objetivoRouter

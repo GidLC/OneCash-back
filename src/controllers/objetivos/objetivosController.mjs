@@ -2,7 +2,7 @@ import ObjetivoModel from "../../models/objetivos/objetivoModel.mjs";
 
 const addObjetivo = (req, res) => {
     const casal = req.header('auth')
-    const {descricao, valor_final, valor_inicial, status, prazo, cor, icone} = req.body
+    const { descricao, valor_final, valor_inicial, status, prazo, cor, icone } = req.body
 
     ObjetivoModel.addObjetivo(descricao, valor_final, valor_inicial, status, prazo, casal, cor, icone, (err, results) => {
         if (err) {
@@ -20,25 +20,70 @@ const readObjetivos = (req, res) => {
 
     ObjetivoModel.readObjetivos(casal, status, (err, results) => {
         if (err) {
-            console.error('Erro ao obter objetivos')
-            return res.status(500).json({error: 'Não foi possível obter os objetivos'})
+            console.error('Erro ao obter objetivos', err)
+            return res.status(500).json({ error: 'Não foi possível obter os objetivos' })
         }
 
-        res.status(200).json({message: 'OK', results})
+        res.status(200).json({ message: 'OK', results })
     })
 }
 
-const deleteObjetivo  = (req, res) => {
+const deleteObjetivo = (req, res) => {
     const casal = req.header('auth')
     const id = req.header('id')
 
     ObjetivoModel.deleteObjetivo(id, casal, (err, results) => {
         if (err) {
-            return res.status(500).json({error: 'Não foi possível excluir esse objetivo'})
+            return res.status(500).json({ error: 'Não foi possível excluir esse objetivo' })
         }
 
-        res.status(200).json({message: 'Objetivo excluido com sucesso', results})
+        res.status(200).json({ message: 'Objetivo excluido com sucesso', results })
     })
 }
 
-export default {addObjetivo, readObjetivos, deleteObjetivo}
+const aporteObjetivo = (req, res) => {
+    const casal = req.header('auth')
+    const valor = req.header('valor')
+    const objetivo = req.header('objetivo')
+
+    ObjetivoModel.aporteValor(objetivo, valor, casal, (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: 'Não foi possível registrar esse depósito' })
+        }
+
+        res.status(200).json({ message: 'Depóstio registrado com sucesso', results })
+    })
+}
+
+const readAportes = (req, res) => {
+    const objetivo = req.header('objetivo')
+    const casal = req.header('auth')
+
+    ObjetivoModel.readAportes(objetivo, casal, (err, results) => {
+        if (err) {
+            console.error('Erro ao encontrar depósitos', err);
+            return res.status(500).json({ error: 'Não foi possível encontrar os depósitos' })
+        }
+
+        res.status(200).json({ message: 'OK', results })
+    })
+}
+
+const mudaStatusObjetivo = (req, res) => {
+    const objetivo = req.header('objetivo')
+    const casal = req.header('auth')
+    const status = req.header('status')
+
+    ObjetivoModel.mudaStatusObjetivo(objetivo, casal, status, (err, results) => {
+        if (err) {
+            console.error('Erro ao mudar o status', err);
+            return res.status(500).json({ error: 'Não foi possível realizar essa ação' })
+        }
+
+        if (status == 1) {
+            res.status(200).json({ message: 'Objetivo concluido com sucesso', results })
+        }
+    })
+}
+
+export default { addObjetivo, readObjetivos, deleteObjetivo, aporteObjetivo, readAportes, mudaStatusObjetivo }
