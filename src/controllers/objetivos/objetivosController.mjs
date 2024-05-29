@@ -28,6 +28,20 @@ const readObjetivos = (req, res) => {
     })
 }
 
+const readObjetivoId = (req, res) => {
+    const casal = req.header('auth')
+    const id = req.header('id')
+
+    ObjetivoModel.readObjetivoId(id, casal, (err, results) => {
+        if (err) {
+            console.error('Erro ao obter objetivo', err)
+            return res.status(500).json({ error: 'Não foi possível obter os objetivo' })
+        }
+
+        res.status(200).json({ message: 'OK', results })
+    })
+}
+
 const deleteObjetivo = (req, res) => {
     const casal = req.header('auth')
     const id = req.header('id')
@@ -86,4 +100,4 @@ const mudaStatusObjetivo = (req, res) => {
     })
 }
 
-export default { addObjetivo, readObjetivos, deleteObjetivo, aporteObjetivo, readAportes, mudaStatusObjetivo }
+export default { addObjetivo, readObjetivos, readObjetivoId, deleteObjetivo, aporteObjetivo, readAportes, mudaStatusObjetivo }

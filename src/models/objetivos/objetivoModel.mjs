@@ -50,50 +50,85 @@ class ObjetivoModel {
         }
     }
 
-    static deleteObjetivo = (id, casal, callback) => {
-        const query = 'DELETE FROM objetivo WHERE id = ? AND casal = ?';
+    static readObjetivoId = async (id, casal, callback) => {
+        try {
+            const queryObj = `SELECT obj.id, obj.descricao, obj.valor_final, obj.valor_inicial, obj.status, obj.prazo, c.codigo AS cod_cor, ic.ion_nome AS icone FROM objetivo AS obj
+            INNER JOIN cor AS c ON obj.cor = c.id 
+            INNER JOIN icones AS ic ON obj.icone = ic.id
+                WHERE obj.casal = ? AND obj.id = ?`;
 
-        connection.query(query, [id, casal], (err, results) => {
-            if (err) {
-                return callback(err, null)
-            }
+            const obj = await new Promise((resolve, reject) => {
+                connection.query(queryObj, [casal, id], (err, results) => {
+                    if (err) {
+                        reject(err)
+                    }
+                    resolve(results)
+                })
+            })
 
-            return callback(null, results)
-        })
+            const valorAportes = await new Promise((resolve, reject) => {
+                const queryAportes = 'SELECT SUM(valor) as valor FROM aporte_objetivo WHERE objetivo = ?'
+                connection.query(queryAportes, [obj[0].id], (err, results) => {
+                    if (err) {
+                        reject(err)
+                    }
+                    resolve(results)
+                })
+            })
+
+            const valorAtual = valorAportes[0].valor + obj[0].valor_inicial
+            const objetivo = { ...obj[0], valorAtual }
+            return callback(null, objetivo)
+
+    } catch(error) {
+        return callback(error, null)
     }
+}
+
+    static deleteObjetivo = (id, casal, callback) => {
+    const query = 'DELETE FROM objetivo WHERE id = ? AND casal = ?';
+
+    connection.query(query, [id, casal], (err, results) => {
+        if (err) {
+            return callback(err, null)
+        }
+
+        return callback(null, results)
+    })
+}
 
     static aporteValor = (objetivoId, valor, casal, callback) => {
-        const query = 'INSERT INTO aporte_objetivo (valor, objetivo, casal) VALUES (?,?,?)'
+    const query = 'INSERT INTO aporte_objetivo (valor, objetivo, casal) VALUES (?,?,?)'
 
-        connection.query(query, [valor, objetivoId, casal], (err, results) => {
-            if (err) {
-                return callback(err, null)
-            }
-            return callback(null, results)
-        })
-    }
+    connection.query(query, [valor, objetivoId, casal], (err, results) => {
+        if (err) {
+            return callback(err, null)
+        }
+        return callback(null, results)
+    })
+}
 
     static readAportes = (objetivoId, casal, callback) => {
-        const query = 'SELECT id, valor, data FROM aporte_objetivo WHERE objetivo = ? AND casal = ?'
+    const query = 'SELECT id, valor, data FROM aporte_objetivo WHERE objetivo = ? AND casal = ?'
 
-        connection.query(query, [objetivoId, casal], (err, results) => {
-            if (err) {
-                return callback(err, null)
-            }
-            return callback(null, results)
-        })
-    }
+    connection.query(query, [objetivoId, casal], (err, results) => {
+        if (err) {
+            return callback(err, null)
+        }
+        return callback(null, results)
+    })
+}
 
     static mudaStatusObjetivo = (objetivoId, casal, status, callback) => {
-        const query = 'UPDATE objetivo SET status = ? WHERE id = ? AND casal = ?'
+    const query = 'UPDATE objetivo SET status = ? WHERE id = ? AND casal = ?'
 
-        connection.query(query, [status, objetivoId, casal], (err, results) => {
-            if (err) {
-                return callback(err, null)
-            }
-            return callback(null, results)
-        })
-    }
+    connection.query(query, [status, objetivoId, casal], (err, results) => {
+        if (err) {
+            return callback(err, null)
+        }
+        return callback(null, results)
+    })
+}
 }
 
 export default ObjetivoModel
