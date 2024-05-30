@@ -9,5 +9,6 @@ objetivoRouter.delete('/deleteObjetivo', objetivosController.deleteObjetivo)
 objetivoRouter.post('/aporteObjetivo', objetivosController.aporteObjetivo)
 objetivoRouter.get('/readAportes', objetivosController.readAportes)
 objetivoRouter.put('/mudaStatusObj', objetivosController.mudaStatusObjetivo)
+objetivoRouter.put('/editObjetivo', objetivosController.editObjetivo)
 
 export default objetivoRouter
