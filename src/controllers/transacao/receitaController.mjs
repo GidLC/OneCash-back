@@ -1,11 +1,11 @@
 import ReceitaModel from "../../models/transacoes/receitaModel.mjs";
 
 const addReceita = (req, res) => {
-  const { descricao, valor, categoria, status, data, banco } = req.body;
+  const { descricao, valor, categoria, status, data, banco, tipo } = req.body;
   console.log(data)
   const cod_casal = req.header('auth');
   const usuario = req.header('usuario')
-  ReceitaModel.addReceita(descricao, valor, usuario, cod_casal, categoria, status, data, banco, (err, resultado) => {
+  ReceitaModel.addReceita(descricao, valor, usuario, cod_casal, categoria, status, data, banco, tipo, (err, resultado) => {
     if (err) {
       console.error('Erro ao cadastrar receita:', err);
       return res.status(500).json({ message: 'Erro ao cadastrar receita' });
@@ -48,9 +48,9 @@ const readReceitaID = (req, res) => {
 const editReceita = (req, res) => {
   const casal = req.header('auth');
   const usuario = req.header('usuario');
-  const {id, descricao, categoria, valor, dia, mes, ano} = req.body
+  const {id, descricao, categoria, valor, data} = req.body
 
-  ReceitaModel.editReceita(casal, usuario, id, descricao, categoria, valor, dia, mes, ano, (err, results) => {
+  ReceitaModel.editReceita(casal, usuario, id, descricao, categoria, valor, data, (err, results) => {
     if (err) {
       console.error('Erro ao editar a receita', err);
       return res.status(500).json({ error: 'Erro ao editar a receita' });

@@ -3,11 +3,10 @@ import SeparaData from "../../data/SeparaData/SeparaData.mjs";
 
 class ReceitaModel {
 
-    static addReceita = async (descricao, valor, usuario, cod_casal, categoria, status, data, banco, callback) => {
-        console.log({descricao, valor, usuario, cod_casal, categoria, status, data, banco})
-        const query = 'INSERT INTO receita (descricao, valor, usuario, casal, categoria, status, dia, mes, ano, banco) VALUES (?,?,?,?,?,?,?,?,?,?)';
+    static addReceita = async (descricao, valor, usuario, cod_casal, categoria, status, data, banco, tipo, callback) => {
+        const query = 'INSERT INTO receita (descricao, valor, usuario, casal, categoria, status, dia, mes, ano, banco, tipo) VALUES (?,?,?,?,?,?,?,?,?,?,?)';
         const objData = await SeparaData(data)
-        connection.query(query, [descricao, valor, usuario, cod_casal, categoria, status, objData.dia, objData.mes, objData.ano, banco], (err, results) => {
+        connection.query(query, [descricao, valor, usuario, cod_casal, categoria, status, objData.dia, objData.mes, objData.ano, banco, tipo], (err, results) => {
             if (err) {
                 return callback(err, null)
             }
@@ -16,21 +15,43 @@ class ReceitaModel {
     }
 
     static readReceita = async (usuario, casal, mes, ano, callback) => {
-        const query = `SELECT rec.id, rec.descricao, rec.valor, rec.dia, rec.mes, rec.ano, cat.nome AS nome_categoria, 
+        console.log({usuario, casal, mes, ano})
+        const queryInd = `SELECT rec.id, rec.descricao, rec.valor, rec.dia, rec.mes, rec.ano, cat.nome AS nome_categoria, 
                        ic.ion_nome AS nome_icone, cor.codigo AS cod_cor, ba.nome AS nome_banco, cat.tipo AS tipo_categoria FROM receita as rec
                         INNER JOIN categoria_tr AS cat ON cat.id = rec.categoria
                         INNER JOIN icones AS ic ON ic.id = cat.icone
                         INNER JOIN cor ON cor.id = cat.cor
                         INNER JOIN banco AS ba ON ba.id = rec.banco
-                            WHERE rec.usuario = ? AND rec.casal = ? AND rec.mes = ? AND rec.ano = ?`;
+                            WHERE rec.usuario = ? AND rec.casal = ? AND rec.mes = ? AND rec.ano = ? AND rec.tipo = 0`
 
-        connection.query(query, [usuario, casal, mes, ano], (err, results) => {
-            if (err) {
-                return callback(err, null)
-            }
-            console.log(results)
-            return callback(null, results)
+        const receitasInd = await new Promise((resolve, reject) => {
+            connection.query(queryInd, [usuario, casal, mes, ano], (err, results) => {
+                if (err) {
+                    reject(err)
+                }
+                resolve(results)
+            })
         })
+
+        const queryCol = `SELECT rec.id, rec.descricao, rec.valor, rec.dia, rec.mes, rec.ano, cat.nome AS nome_categoria, 
+                            ic.ion_nome AS nome_icone, cor.codigo AS cod_cor, ba.nome AS nome_banco, cat.tipo AS tipo_categoria FROM receita as rec
+                                INNER JOIN categoria_tr AS cat ON cat.id = rec.categoria
+                                INNER JOIN icones AS ic ON ic.id = cat.icone
+                                INNER JOIN cor ON cor.id = cat.cor
+                                INNER JOIN banco AS ba ON ba.id = rec.banco
+                                    WHERE rec.casal = ? AND rec.mes = ? AND rec.ano = ? AND rec.tipo = 1`
+
+        const receitasCol = await new Promise((resolve, reject) => {
+            connection.query(queryCol, [casal, mes, ano], (err, results) => {
+                if (err) {
+                    reject(err)
+                }
+                resolve(results)
+            })
+        })
+
+        const receitas = [...receitasInd, ...receitasCol]
+        return callback (null, receitas)
     }
 
     static readReceitaID = async (id, usuario, casal, callback) => {
@@ -48,10 +69,10 @@ class ReceitaModel {
         })
     }
 
-    static editReceita = async (casal, usuario, id, descricao, categoria, valor, dia, mes, ano, callback) => {
-        const query = `UPDATE receita SET descricao = ?, categoria = ?, valor =?, dia = ?, mes = ?, ano = ? WHERE casal = ? AND usuario = ? AND id = ?`
-
-        connection.query(query, [descricao, categoria, valor, dia, mes, ano, casal, usuario, id], (err, results) => {
+    static editReceita = async (casal, usuario, id, descricao, categoria, valor, data, callback) => {
+        const query = `UPDATE receita SET descricao = ?, categoria = ?, valor = ?, dia = ?, mes = ?, ano = ? WHERE casal = ? AND id = ?`
+        const objData = await SeparaData(data)
+        connection.query(query, [descricao, categoria, valor, objData.dia, objData.mes, objData.ano, casal, id], (err, results) => {
             if (err) {
                 return callback(err, null)
             }
