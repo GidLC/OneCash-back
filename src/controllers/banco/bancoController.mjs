@@ -1,7 +1,7 @@
 import BancoModel from "../../models/banco/bancoModel.mjs";
 
 const addBanco = (req, res) => {
-    console.log(req.body)
+
     const { saldo_inicial, nome, tipo } = req.body;
     const casal = req.header('auth');
     const usuario = req.header('usuario')
@@ -24,10 +24,8 @@ const readBanco = (req, res) => {
         if(err) {
             return res.status(500).json({error: 'Erro ao encontrar bancos'});
         } else if(results.length == 0) {
-            console.log(cod_casal, usuario)
             return res.status(500).json({error: 'Não há bancos para serem listados'});
         }
-        console.log(cod_casal, usuario)
 
         res.status(200).json({message: 'Bancos encontrados', results});
     });

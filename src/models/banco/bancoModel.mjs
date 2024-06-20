@@ -51,7 +51,6 @@ class BancoModel {
 
         const bancos = [...bancosInd, ...bancosCol]
 
-        console.log({ cod_casal, usuario })
         callback(null, bancos)
     }
 
@@ -61,7 +60,6 @@ class BancoModel {
             if (err) {
                 return callback(err, null)
             }
-            console.log(results[0])
             return callback(null, results[0])
         });
     }
@@ -155,7 +153,6 @@ class BancoModel {
                     return { ...banco, saldo, saldoInicial };
                 }));
 
-                console.log(bancosComSaldoInd)
                 return callback(null, bancosComSaldoInd);
                 //Saldos conjuntos
             } else if (tipo == 1) {
@@ -194,7 +191,6 @@ class BancoModel {
                     });
 
                     const receitas = receitasBD[0].total_receitas || 0;
-                    console.log(banco.id, casal)
 
                     const queryDespesas = 'SELECT SUM(valor) AS total_despesas FROM despesa WHERE banco = ? AND casal = ?';
                     const despesasBD = await new Promise((resolve, reject) => {

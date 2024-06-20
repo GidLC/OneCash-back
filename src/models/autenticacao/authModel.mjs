@@ -3,7 +3,6 @@ import * as crypto from 'crypto'
 import enviaEmail from "../../data/enviaEmail/enviaEmail.mjs";
 import EmailParceiro from "../../data/emails/Cadastro/EmailParceiro.mjs";
 import EmailCadastro from "../../data/emails/Cadastro/EmailCadastro.mjs";
-import { error } from "console";
 
 class AuthModel {
 
@@ -277,6 +276,7 @@ class AuthModel {
             }
           })
         });
+        console.log(parceiro[0].nome)
 
         return callback(null, {
           id: login[0].id,
@@ -285,7 +285,7 @@ class AuthModel {
           email_parceiro: login[0].email_parceiro,
           cod_casal: casal[0].cod_casal,
           id_parceiro: id_parceiro,
-          //nome_parceiro: parceiro[0].nome
+          nome_parceiro: parceiro[0].nome
         })
       } else {
         const id_parceiro = casal[0].usuario_princ

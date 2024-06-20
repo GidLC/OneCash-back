@@ -165,7 +165,6 @@ class SaldosModel {
                 return { ...banco, saldo };
             }));
 
-            console.log({bancosComSaldoInd, bancosComSaldoCol})
 
             const saldoIndividual = bancosComSaldoInd.reduce((acumulador, banco) => acumulador + banco.saldo, 0)
             const saldoColetivo = bancosComSaldoCol.reduce((acumulador, banco) => acumulador + banco.saldo, 0)

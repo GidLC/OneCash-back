@@ -5,6 +5,9 @@ import cors from 'cors';
 import { host, user, password, database } from './dbConfig.mjs';
 
 const app = express();
+app.use(cors());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 const connection = mysql.createConnection({
   host: host,
@@ -20,9 +23,5 @@ connection.connect((err) => {
   }
   console.log('Conexão ao banco de dados MySQL estabelecida');
 });
-
-app.use(cors());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
 
 export { app, connection };
