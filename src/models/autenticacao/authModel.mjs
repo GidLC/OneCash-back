@@ -22,14 +22,14 @@ class AuthModel {
             reject(err)
           }
 
-          /*await enviaEmail(email,
+          await enviaEmail(email,
             "Cadastro no OneCash",
             EmailCadastro(nome, codigoCasal)
             );
   
           await enviaEmail(email_parceiro,
             "Cadastro no OneCash",
-            EmailParceiro(nome, codigoCasal))*/
+            EmailParceiro(nome, codigoCasal))
 
           resolve(results)
         });
@@ -220,7 +220,6 @@ class AuthModel {
       const senhaHash = crypto.createHash('sha256').update(senha).digest('hex')
       const data = new Date()
       const hoje = data.toISOString()
-      console.log(`Email: ${email}, Senha: ${senha}`)
 
       //Verifica a existência do usuário
       const queryLogin = `SELECT * FROM usuario where email = ? AND senha = ?`;

@@ -24,4 +24,4 @@ connection.connect((err) => {
   console.log('Conexão ao banco de dados MySQL estabelecida');
 });
 
-export { app, connection };
+export { app, connection};

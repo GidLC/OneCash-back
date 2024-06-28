@@ -13,4 +13,20 @@ const saldoGeral = (req, res) => {
     })
 }
 
-export default {saldoGeral}
+const saldoPorPeriodo = (req, res) => {
+    const casal = req.header('auth')
+    const usuario = req.header('usuario')
+    const parceiro = req.header('parceiro')
+    const ano = req.header('ano')
+
+    SaldosModel.saldoPorPeriodo(casal, usuario, parceiro, ano, (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: 'Erro ao encontrar os saldos' });
+        }
+
+        res.status(200).json({ message: 'OK', results });
+    })
+
+}
+
+export default {saldoGeral, saldoPorPeriodo}
