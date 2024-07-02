@@ -1,4 +1,4 @@
-import graficosModel from "../../models/graficos/graficosModels.mjs";
+import graficosModel from "../../models/graficos/graficosModel.mjs";
 
 const receitaPorCategoria = (req, res) => {
     const casal = req.header('auth');

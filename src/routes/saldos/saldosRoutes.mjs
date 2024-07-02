@@ -1,8 +1,8 @@
 import express from 'express'
 const saldosRouter = express.Router();
-import saldosCotroller from '../../controllers/saldos/saldosCotroller.mjs';
+import saldosController from '../../controllers/saldos/saldosController.mjs';
 
-saldosRouter.get('/saldoGeral', saldosCotroller.saldoGeral)
-saldosRouter.get('/saldoPeriodo', saldosCotroller.saldoPorPeriodo)
+saldosRouter.get('/saldoGeral', saldosController.saldoGeral)
+saldosRouter.get('/saldoPeriodo', saldosController.saldoPorPeriodo)
 
 export default saldosRouter
