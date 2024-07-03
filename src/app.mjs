@@ -36,13 +36,7 @@ app.listen(PORT, () => {
   console.log(`Servidor Node.js em execução na porta ${PORT}`);
 });
 
-const client = new Client({
-  webVersionCache: {
-    type: "remote",
-    remotePath:
-      "https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2412.54.html",
-  },
-});
+const client = new Client();
 
 client.on('qr', qr => {
   qrcode.generate(qr, { small: true });

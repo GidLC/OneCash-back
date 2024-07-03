@@ -266,7 +266,7 @@ class SaldosModel {
                         return saldo + (index === 0 ? saldoInicial : saldoMensal.slice(0, index).reduce((acc, val) => acc + val, saldoInicial));
                     });
 
-                    return [banco.id, saldoInicialBD, receitasBD, despesasBD, transfCredBD, transfDebBD];
+                    return {saldoInicial, receitasBD, despesasBD, transfCredBD, transfDebBD}
                 }));
 
                 return bancosComSaldo;

@@ -311,7 +311,7 @@ class AuthModel {
       }
     } catch (error) {
       if (!connection.state || connection.state === 'disconnected' || error.code === 'PROTOCOL_CONNECTION_LOST' || error.code === 'ER_REDIS_DOWN') {
-        console.log('A conexão foi perdida, tentando reconectar...');
+        console.log('A conexão foi perdida, tentando reconectar...', error);
         connection.connect();
       } else {
         throw error
