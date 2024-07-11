@@ -179,7 +179,7 @@ class SaldosModel {
     static saldoPorPeriodo = async (casal, usuario, parceiro, ano, callback) => {
         try {
             //Função para buscar saldos
-            const getSaldos = async (queryBanco, paramsBanco, paramsTransf, tipo) => {
+            const getSaldos = async (queryBanco, paramsBanco) => {
                 //Busca bancos(coletivos e individuais)
                 const bancosBD = await new Promise((resolve, reject) => {
                     connection.query(queryBanco, paramsBanco, (err, results) => {
@@ -201,6 +201,7 @@ class SaldosModel {
                         });
                     });
                     //Define saldo inicial do banco
+                    const bancoId = banco.id
                     const saldoInicial = saldoInicialBD[0].saldo_inicial;
                     const saldoMensal = Array(12).fill(0);
 
@@ -216,7 +217,7 @@ class SaldosModel {
                     });
 
                     receitasBD.forEach(({ total, mes }) => {
-                        saldoMensal[mes - 1] += total;
+                        saldoMensal[mes] += total;
                     });
 
                     //Busca todas despesas do banco
@@ -231,7 +232,7 @@ class SaldosModel {
                     });
 
                     despesasBD.forEach(({ total, mes }) => {
-                        saldoMensal[mes - 1] -= total;
+                        saldoMensal[mes] -= total;
                     });
 
                     const queryTransfDeb = 'SELECT SUM(valor) AS total, mes FROM transferencias WHERE banco_origem = ? AND casal = ? AND ano = ? AND tipo = 0 GROUP BY mes ORDER BY mes';
@@ -245,10 +246,10 @@ class SaldosModel {
                     });
 
                     transfDebBD.forEach(({ total, mes }) => {
-                        saldoMensal[mes - 1] -= total;
+                        saldoMensal[mes] -= total;
                     });
 
-                    const queryTransfCred = 'SELECT SUM(valor) AS total, mes FROM transferencias WHERE banco_destino = ? AND casal = ? AND ano = ? AND tipo = 1 GROUP BY mes ORDER BY mes';
+                    const queryTransfCred = 'SELECT SUM(valor) AS total, mes FROM transferencias WHERE banco_origem = ? AND casal = ? AND ano = ? AND tipo = 1 GROUP BY mes ORDER BY mes';
                     const transfCredBD = await new Promise((resolve, reject) => {
                         connection.query(queryTransfCred, [banco.id, casal, ano], (err, results) => {
                             if (err) {
@@ -259,14 +260,10 @@ class SaldosModel {
                     });
 
                     transfCredBD.forEach(({ total, mes }) => {
-                        saldoMensal[mes - 1] += total;
+                        saldoMensal[mes] += total;
                     });
 
-                    const saldosAcumulados = saldoMensal.map((saldo, index) => {
-                        return saldo + (index === 0 ? saldoInicial : saldoMensal.slice(0, index).reduce((acc, val) => acc + val, saldoInicial));
-                    });
-
-                    return {saldoInicial, receitasBD, despesasBD, transfCredBD, transfDebBD}
+                    return {bancoId, saldoInicial, receitasBD, despesasBD, transfCredBD, transfDebBD}
                 }));
 
                 return bancosComSaldo;

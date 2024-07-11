@@ -25,33 +25,38 @@ class BancoModel {
     }
 
     static readBanco = async (cod_casal, usuario, arquivo, callback) => {
-        //bancos individuais
-        const queryBancoInd = 'SELECT id, nome, tipo, saldo_inicial FROM banco where casal = ? AND usuario = ? AND tipo = 0 AND arquivo = ?';
-        const bancosInd = await new Promise((resolve, reject) => {
-            connection.query(queryBancoInd, [cod_casal, usuario, arquivo], (err, results) => {
-                if (err) {
-                    reject(err)
-                }
+        try {
+            //bancos individuais
+            const queryBancoInd = 'SELECT id, nome, tipo, saldo_inicial FROM banco where casal = ? AND usuario = ? AND tipo = 0 AND arquivo = ?';
+            const bancosInd = await new Promise((resolve, reject) => {
+                connection.query(queryBancoInd, [cod_casal, usuario, arquivo], (err, results) => {
+                    if (err) {
+                        reject(err)
+                    }
 
-                resolve(results)
+                    resolve(results)
+                });
             });
-        });
 
-        //bancos coletivos
-        const queryBancoCol = 'SELECT id, nome, tipo, saldo_inicial FROM banco where casal = ? AND tipo = 1 AND arquivo = ?';
-        const bancosCol = await new Promise((resolve, reject) => {
-            connection.query(queryBancoCol, [cod_casal, usuario, arquivo], (err, results) => {
-                if (err) {
-                    reject(err)
-                }
+            //bancos coletivos
+            const queryBancoCol = 'SELECT id, nome, tipo, saldo_inicial FROM banco where casal = ? AND tipo = 1 AND arquivo = ?';
+            const bancosCol = await new Promise((resolve, reject) => {
+                connection.query(queryBancoCol, [cod_casal,  arquivo], (err, results) => {
+                    if (err) {
+                        reject(err)
+                    }
 
-                resolve(results)
+                    resolve(results)
+                });
             });
-        });
 
-        const bancos = [...bancosInd, ...bancosCol]
+            console.log([...bancosInd, ...bancosCol])
 
-        callback(null, bancos)
+            callback(null, [...bancosInd, ...bancosCol])
+        } catch (error) {
+            console.error("Houve um erro na busca dos bancos", error)
+        }
+
     }
 
     static readBancoID = (cod_casal, id, callback) => {
