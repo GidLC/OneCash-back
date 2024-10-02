@@ -1,4 +1,4 @@
-import { connection } from "../../config.mjs";
+import { pool } from "../../config.mjs";
 import SeparaData from "../../data/SeparaData/SeparaData.mjs";
 
 class TransfModel {
@@ -8,7 +8,7 @@ class TransfModel {
             //No banco de origem se cria uma despesa(débito 0)
             const debitoTr = await new Promise((resolve, reject) => {
                 const queryDebito = 'INSERT INTO transferencias(descricao, valor, usuario, casal, dia, mes, ano, banco_origem, banco_destino, tipo) VALUES (?,?,?,?,?,?,?,?,?,?)';
-                connection.query(queryDebito, ['Transferência saída', valor, usuario, casal, objData.dia, objData.mes, objData.ano, bancoOrigem, bancoDestino, 0], (err, results) => {
+                pool.query(queryDebito, ['Transferência saída', valor, usuario, casal, objData.dia, objData.mes, objData.ano, bancoOrigem, bancoDestino, 0], (err, results) => {
                     if (err) {
                         reject(err)
                     }
@@ -19,7 +19,7 @@ class TransfModel {
             //No banco destino se cria uma receita(crédito 1)
             const creditoTr = await new Promise((resolve, reject) => {
                 const queryCredito = 'INSERT INTO transferencias(descricao, valor, usuario, casal, dia, mes, ano, banco_origem, banco_destino, tipo, relacao) VALUES (?,?,?,?,?,?,?,?,?,?,?)';
-                connection.query(queryCredito, ['Transferência entrada', valor, usuario, casal, objData.dia, objData.mes, objData.ano, bancoDestino, bancoOrigem, 1, debitoTr.insertId], (err, results) => {
+                pool.query(queryCredito, ['Transferência entrada', valor, usuario, casal, objData.dia, objData.mes, objData.ano, bancoDestino, bancoOrigem, 1, debitoTr.insertId], (err, results) => {
                     if (err) {
                         reject(err)
                     }
@@ -29,7 +29,7 @@ class TransfModel {
 
             await new Promise((resolve, reject) => {
                 const queryRelacaoDebCred = 'UPDATE transferencias SET relacao = ? WHERE id = ?'
-                connection.query(queryRelacaoDebCred, [creditoTr.insertId, debitoTr.insertId], (err, results) => {
+                pool.query(queryRelacaoDebCred, [creditoTr.insertId, debitoTr.insertId], (err, results) => {
                     if (err) {
                         reject(err)
                     }
@@ -50,7 +50,7 @@ class TransfModel {
                                 INNER JOIN banco origem ON tr.banco_origem = origem.id
                                 INNER JOIN banco destino ON tr.banco_destino = destino.id
                                     WHERE tr.usuario = ? AND tr.casal = ? AND tr.mes = ? AND tr.ano = ?`
-            connection.query(query, [usuario, casal, mes, ano], (err, results) => {
+            pool.query(query, [usuario, casal, mes, ano], (err, results) => {
                 if (err) {
                     return callback(err, null)
                 }
@@ -67,7 +67,7 @@ class TransfModel {
         try {
             const queryDeb = `DELETE FROM transferencias WHERE casal = ? AND id = ?`;
             await new Promise((resolve, reject) => {
-                connection.query(queryDeb, [casal, id], (err, results) => {
+                pool.query(queryDeb, [casal, id], (err, results) => {
                     if (err) {
                         reject(err)
                     }
@@ -78,7 +78,7 @@ class TransfModel {
 
             const queryCred = `DELETE FROM transferencias WHERE casal = ? AND relacao = ?`;
             await new Promise((resolve, reject) => {
-                connection.query(queryCred, [casal, id], (err, results) => {
+                pool.query(queryCred, [casal, id], (err, results) => {
                     if (err) {
                         reject(err)
                     }
@@ -100,7 +100,7 @@ class TransfModel {
             INNER JOIN banco origem ON tr.banco_origem = origem.id
             INNER JOIN banco destino ON tr.banco_destino = destino.id
                 WHERE tr.id = ? AND tr.casal = ?`
-            connection.query(query, [id, casal], (err, results) => {
+            pool.query(query, [id, casal], (err, results) => {
                 if (err) {
                     return callback(err, null)
                 }
@@ -117,7 +117,7 @@ class TransfModel {
             const objData = await SeparaData(data)
             await new Promise((resolve, reject) => {
                 const query = 'UPDATE transferencias set valor = ?, dia = ?, mes = ?, ano = ?, banco_origem = ?, banco_destino = ? WHERE id = ? AND casal = ?'
-                connection.query(query, [valor, objData.dia, objData.mes, objData.ano, bancoOrigem, bancoDestino, id, casal], (err, results) => {
+                pool.query(query, [valor, objData.dia, objData.mes, objData.ano, bancoOrigem, bancoDestino, id, casal], (err, results) => {
                     if (err) {
                         reject(err)
                     }
@@ -128,7 +128,7 @@ class TransfModel {
 
             await new Promise((resolve, reject) => {
                 const query = 'UPDATE transferencias SET valor = ?, dia = ?, mes = ?, ano = ?, banco_origem = ?, banco_destino = ? WHERE id = ? AND casal = ?'
-                connection.query(query, [valor, objData.dia, objData.mes, objData.ano, bancoDestino, bancoOrigem, idRelacao, casal], (err, results) => {
+                pool.query(query, [valor, objData.dia, objData.mes, objData.ano, bancoDestino, bancoOrigem, idRelacao, casal], (err, results) => {
                     if (err) {
                         reject(err)
                     }

@@ -1,4 +1,4 @@
-import { connection } from "../../config.mjs";
+import { pool } from "../../config.mjs";
 
 class SaldosModel {
     static saldoGeral = async (casal, usuario, callback) => {
@@ -7,7 +7,7 @@ class SaldosModel {
             //seleciona todos os bancos
             const queryBancoInd = 'SELECT * FROM banco WHERE casal = ? AND usuario = ? AND tipo = 0 AND arquivo = 0';
             const bancosBDInd = await new Promise((resolve, reject) => {
-                connection.query(queryBancoInd, [casal, usuario], (err, results) => {
+                pool.query(queryBancoInd, [casal, usuario], (err, results) => {
                     if (err) {
                         reject(err)
                     }
@@ -20,7 +20,7 @@ class SaldosModel {
                 //Saldo inicial
                 const saldoInicialBD = await new Promise((resolve, reject) => {
                     const querysaldoInicial = 'SELECT saldo_inicial FROM banco WHERE id = ? AND casal = ? AND usuario = ?';
-                    connection.query(querysaldoInicial, [banco.id, casal, usuario], (err, results) => {
+                    pool.query(querysaldoInicial, [banco.id, casal, usuario], (err, results) => {
                         if (err) {
                             reject(err);
                         }
@@ -32,7 +32,7 @@ class SaldosModel {
                 //receitas
                 const queryreceitas = 'SELECT SUM(valor) AS total_receitas FROM receita WHERE banco = ? AND casal = ? AND usuario = ?';
                 const receitasBD = await new Promise((resolve, reject) => {
-                    connection.query(queryreceitas, [banco.id, casal, usuario], (err, results) => {
+                    pool.query(queryreceitas, [banco.id, casal, usuario], (err, results) => {
                         if (err) {
                             reject(err);
                         }
@@ -44,7 +44,7 @@ class SaldosModel {
 
                 const queryDespesas = 'SELECT SUM(valor) AS total_despesas FROM despesa WHERE banco = ? AND casal = ? AND usuario = ?';
                 const despesasBD = await new Promise((resolve, reject) => {
-                    connection.query(queryDespesas, [banco.id, casal, usuario], (err, results) => {
+                    pool.query(queryDespesas, [banco.id, casal, usuario], (err, results) => {
                         if (err) {
                             reject(err);
                         }
@@ -57,7 +57,7 @@ class SaldosModel {
                 //Transferências de saída
                 const queryTransfDeb = 'SELECT SUM(valor) AS total_transf_deb FROM transferencias WHERE banco_origem = ? AND casal = ? AND usuario = ? AND tipo = 0';
                 const transfDebBD = await new Promise((resolve, reject) => {
-                    connection.query(queryTransfDeb, [banco.id, casal, usuario], (err, results) => {
+                    pool.query(queryTransfDeb, [banco.id, casal, usuario], (err, results) => {
                         if (err) {
                             reject(err);
                         }
@@ -70,7 +70,7 @@ class SaldosModel {
                 //Transferências de entrada
                 const queryTransfCred = 'SELECT SUM(valor) AS total_transf_cred FROM transferencias WHERE banco_origem = ? AND casal = ? AND usuario = ? AND tipo = 1';
                 const transfCredBD = await new Promise((resolve, reject) => {
-                    connection.query(queryTransfCred, [banco.id, casal, usuario], (err, results) => {
+                    pool.query(queryTransfCred, [banco.id, casal, usuario], (err, results) => {
                         if (err) {
                             reject(err);
                         }
@@ -89,7 +89,7 @@ class SaldosModel {
             //Saldos conjuntos
             const queryBancoCol = 'SELECT * FROM banco WHERE casal = ? AND tipo = 1 AND arquivo = 0';
             const bancosBDCol = await new Promise((resolve, reject) => {
-                connection.query(queryBancoCol, [casal], (err, results) => {
+                pool.query(queryBancoCol, [casal], (err, results) => {
                     if (err) {
                         reject(err)
                     }
@@ -100,7 +100,7 @@ class SaldosModel {
             const bancosComSaldoCol = await Promise.all(bancosBDCol.map(async (banco) => {
                 const saldoInicialBD = await new Promise((resolve, reject) => {
                     const querysaldoInicial = 'SELECT saldo_inicial FROM banco WHERE id = ? AND casal = ? AND tipo = 1';
-                    connection.query(querysaldoInicial, [banco.id, casal], (err, results) => {
+                    pool.query(querysaldoInicial, [banco.id, casal], (err, results) => {
                         if (err) {
                             reject(err);
                         }
@@ -112,7 +112,7 @@ class SaldosModel {
 
                 const queryreceitas = 'SELECT SUM(valor) AS total_receitas FROM receita WHERE banco = ? AND casal = ?';
                 const receitasBD = await new Promise((resolve, reject) => {
-                    connection.query(queryreceitas, [banco.id, casal], (err, results) => {
+                    pool.query(queryreceitas, [banco.id, casal], (err, results) => {
                         if (err) {
                             reject(err);
                         }
@@ -124,7 +124,7 @@ class SaldosModel {
 
                 const queryDespesas = 'SELECT SUM(valor) AS total_despesas FROM despesa WHERE banco = ? AND casal = ?';
                 const despesasBD = await new Promise((resolve, reject) => {
-                    connection.query(queryDespesas, [banco.id, casal], (err, results) => {
+                    pool.query(queryDespesas, [banco.id, casal], (err, results) => {
                         if (err) {
                             reject(err);
                         }
@@ -137,7 +137,7 @@ class SaldosModel {
                 //Transferências de saída
                 const queryTransfDeb = 'SELECT SUM(valor) AS total_transf_deb FROM transferencias WHERE banco_origem = ? AND casal = ? AND tipo = 0';
                 const transfDebBD = await new Promise((resolve, reject) => {
-                    connection.query(queryTransfDeb, [banco.id, casal], (err, results) => {
+                    pool.query(queryTransfDeb, [banco.id, casal], (err, results) => {
                         if (err) {
                             reject(err);
                         }
@@ -150,7 +150,7 @@ class SaldosModel {
                 //Transferências de entrada
                 const queryTransfCred = 'SELECT SUM(valor) AS total_transf_cred FROM transferencias WHERE banco_origem = ? AND casal = ? AND tipo = 1';
                 const transfCredBD = await new Promise((resolve, reject) => {
-                    connection.query(queryTransfCred, [banco.id, casal], (err, results) => {
+                    pool.query(queryTransfCred, [banco.id, casal], (err, results) => {
                         if (err) {
                             reject(err);
                         }
@@ -182,7 +182,7 @@ class SaldosModel {
             const getSaldos = async (queryBanco, paramsBanco) => {
                 //Busca bancos(coletivos e individuais)
                 const bancosBD = await new Promise((resolve, reject) => {
-                    connection.query(queryBanco, paramsBanco, (err, results) => {
+                    pool.query(queryBanco, paramsBanco, (err, results) => {
                         if (err) {
                             reject(err);
                         }
@@ -193,7 +193,7 @@ class SaldosModel {
                 const bancosComSaldo = await Promise.all(bancosBD.map(async (banco) => {
                     const saldoInicialBD = await new Promise((resolve, reject) => {
                         const querySaldoInicial = 'SELECT saldo_inicial FROM banco WHERE id = ? AND casal = ?';
-                        connection.query(querySaldoInicial, [banco.id, casal], (err, results) => {
+                        pool.query(querySaldoInicial, [banco.id, casal], (err, results) => {
                             if (err) {
                                 reject(err);
                             }
@@ -208,7 +208,7 @@ class SaldosModel {
                     //Busca todas receitas dos bancos
                     const queryReceitas = 'SELECT SUM(valor) AS total, mes FROM receita WHERE banco = ? AND casal = ? AND ano = ? GROUP BY mes ORDER BY mes';
                     const receitasBD = await new Promise((resolve, reject) => {
-                        connection.query(queryReceitas, [banco.id, casal, ano], (err, results) => {
+                        pool.query(queryReceitas, [banco.id, casal, ano], (err, results) => {
                             if (err) {
                                 reject(err);
                             }
@@ -223,7 +223,7 @@ class SaldosModel {
                     //Busca todas despesas do banco
                     const queryDespesas = 'SELECT SUM(valor) AS total, mes FROM despesa WHERE banco = ? AND casal = ? AND ano = ? GROUP BY mes ORDER BY mes';
                     const despesasBD = await new Promise((resolve, reject) => {
-                        connection.query(queryDespesas, [banco.id, casal, ano], (err, results) => {
+                        pool.query(queryDespesas, [banco.id, casal, ano], (err, results) => {
                             if (err) {
                                 reject(err);
                             }
@@ -237,7 +237,7 @@ class SaldosModel {
 
                     const queryTransfDeb = 'SELECT SUM(valor) AS total, mes FROM transferencias WHERE banco_origem = ? AND casal = ? AND ano = ? AND tipo = 0 GROUP BY mes ORDER BY mes';
                     const transfDebBD = await new Promise((resolve, reject) => {
-                        connection.query(queryTransfDeb, [banco.id, casal, ano], (err, results) => {
+                        pool.query(queryTransfDeb, [banco.id, casal, ano], (err, results) => {
                             if (err) {
                                 reject(err);
                             }
@@ -251,7 +251,7 @@ class SaldosModel {
 
                     const queryTransfCred = 'SELECT SUM(valor) AS total, mes FROM transferencias WHERE banco_origem = ? AND casal = ? AND ano = ? AND tipo = 1 GROUP BY mes ORDER BY mes';
                     const transfCredBD = await new Promise((resolve, reject) => {
-                        connection.query(queryTransfCred, [banco.id, casal, ano], (err, results) => {
+                        pool.query(queryTransfCred, [banco.id, casal, ano], (err, results) => {
                             if (err) {
                                 reject(err);
                             }

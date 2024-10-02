@@ -1,10 +1,10 @@
-import { connection } from "../../config.mjs";
+import { pool } from "../../config.mjs";
 
 class ObjetivoModel {
     static addObjetivo = (descricao, valor_final, valor_inicial, status, prazo, casal, cor, icone, callback) => {
         const query = 'INSERT INTO objetivo (descricao, valor_final, valor_inicial, status, prazo, casal, cor, icone) VALUES (?,?,?,?,?,?,?,?)'
 
-        connection.query(query, [descricao, valor_final, valor_inicial, status, prazo, casal, cor, icone], (err, results) => {
+        pool.query(query, [descricao, valor_final, valor_inicial, status, prazo, casal, cor, icone], (err, results) => {
             if (err) {
                 return callback(err, null)
             }
@@ -21,7 +21,7 @@ class ObjetivoModel {
                 WHERE casal = ? AND status = ?`;
 
             const objs = await new Promise((resolve, reject) => {
-                connection.query(queryObjs, [casal, status], (err, results) => {
+                pool.query(queryObjs, [casal, status], (err, results) => {
                     if (err) {
                         reject(err)
                     }
@@ -32,7 +32,7 @@ class ObjetivoModel {
             const objetivos = await Promise.all(objs.map(async (objetivo) => {
                 const valorAportes = await new Promise((resolve, reject) => {
                     const queryAportes = 'SELECT SUM(valor) as valor FROM aporte_objetivo WHERE objetivo = ?'
-                    connection.query(queryAportes, [objetivo.id], (err, results) => {
+                    pool.query(queryAportes, [objetivo.id], (err, results) => {
                         if (err) {
                             reject(err)
                         }
@@ -58,7 +58,7 @@ class ObjetivoModel {
                 WHERE obj.casal = ? AND obj.id = ?`;
 
             const obj = await new Promise((resolve, reject) => {
-                connection.query(queryObj, [casal, id], (err, results) => {
+                pool.query(queryObj, [casal, id], (err, results) => {
                     if (err) {
                         reject(err)
                     }
@@ -67,7 +67,7 @@ class ObjetivoModel {
             })
             const valorAportes = await new Promise((resolve, reject) => {
                 const queryAportes = 'SELECT SUM(valor) as valor FROM aporte_objetivo WHERE objetivo = ?'
-                connection.query(queryAportes, [obj.id], (err, results) => {
+                pool.query(queryAportes, [obj.id], (err, results) => {
                     if (err) {
                         reject(err)
                     }
@@ -87,7 +87,7 @@ class ObjetivoModel {
     static deleteObjetivo = (id, casal, callback) => {
         const query = 'DELETE FROM objetivo WHERE id = ? AND casal = ?';
 
-        connection.query(query, [id, casal], (err, results) => {
+        pool.query(query, [id, casal], (err, results) => {
             if (err) {
                 return callback(err, null)
             }
@@ -99,7 +99,7 @@ class ObjetivoModel {
     static aporteValor = (objetivoId, valor, casal, callback) => {
         const query = 'INSERT INTO aporte_objetivo (valor, objetivo, casal) VALUES (?,?,?)'
 
-        connection.query(query, [valor, objetivoId, casal], (err, results) => {
+        pool.query(query, [valor, objetivoId, casal], (err, results) => {
             if (err) {
                 return callback(err, null)
             }
@@ -110,7 +110,7 @@ class ObjetivoModel {
     static readAportes = (objetivoId, casal, callback) => {
         const query = 'SELECT id, valor, data FROM aporte_objetivo WHERE objetivo = ? AND casal = ?'
 
-        connection.query(query, [objetivoId, casal], (err, results) => {
+        pool.query(query, [objetivoId, casal], (err, results) => {
             if (err) {
                 return callback(err, null)
             }
@@ -121,7 +121,7 @@ class ObjetivoModel {
     static mudaStatusObjetivo = (objetivoId, casal, status, callback) => {
         const query = 'UPDATE objetivo SET status = ? WHERE id = ? AND casal = ?'
 
-        connection.query(query, [status, objetivoId, casal], (err, results) => {
+        pool.query(query, [status, objetivoId, casal], (err, results) => {
             if (err) {
                 return callback(err, null)
             }
@@ -132,7 +132,7 @@ class ObjetivoModel {
     static editObjetivo = (casal, id, descricao, valor_final, prazo, cor, icone, callback) => {
         const query = 'UPDATE objetivo SET descricao = ?, valor_final = ?, prazo = ?, cor = ?, icone = ? WHERE id = ? AND casal = ?'
 
-        connection.query(query, [descricao, valor_final, prazo, cor, icone, id, casal], (err, results) => {
+        pool.query(query, [descricao, valor_final, prazo, cor, icone, id, casal], (err, results) => {
             if (err) {
                 return callback(err, null)
             }

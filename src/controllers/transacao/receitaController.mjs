@@ -48,9 +48,9 @@ const readReceitaID = (req, res) => {
 const editReceita = (req, res) => {
   const casal = req.header('auth');
   const usuario = req.header('usuario');
-  const {id, descricao, categoria, valor, data} = req.body
+  const {id, descricao, categoria, valor, data, tipo} = req.body
 
-  ReceitaModel.editReceita(casal, usuario, id, descricao, categoria, valor, data, (err, results) => {
+  ReceitaModel.editReceita(casal, usuario, tipo, id, descricao, categoria, valor, data, (err, results) => {
     if (err) {
       console.error('Erro ao editar a receita', err);
       return res.status(500).json({ error: 'Erro ao editar a receita' });

@@ -13,10 +13,10 @@ const loginUsuario = (req, res) => {
 };
 
 const cadastroUsuario = (req, res) => {
-  const { nome, email, senha, email_parceiro, dt_criacao } = req.body;
+  const { nome, email, senha, email_parceiro, fone, dt_criacao } = req.body;
 
   // Chame o método salvarUsuario do modelo
-  AuthModel.cadastroUsuario(nome, email, senha, email_parceiro, dt_criacao, (err, resultado) => {
+  AuthModel.cadastroUsuario(nome, email, senha, email_parceiro, fone, dt_criacao, (err, resultado) => {
     if (err) {
       console.error('Erro ao salvar o usuário:', err);
       return res.status(500).json({ error: 'Erro ao salvar o usuário' });
@@ -93,5 +93,18 @@ const mudaSenha = (req, res) => {
   })
 }
 
-export default { cadastroUsuario, loginUsuario, buscaCadastro, vincCadastro, buscaCadastroEmail, validaToken, mudaSenha }
+const editUser = (req, res) => {
+  const {nome, email, fone, id} = req.body
+  console.log(nome, email, fone, id)
+
+  AuthModel.editUser(nome, email, fone, id, (err, results) => {
+    if (err) {
+      return res.status(500).json({error: "Erro ao realizar a alteração"})
+    }
+
+    return res.status(200).json({message: "Alteração realizada com sucesso", results})
+  })
+}
+
+export default { cadastroUsuario, loginUsuario, buscaCadastro, vincCadastro, buscaCadastroEmail, validaToken, mudaSenha, editUser}
 

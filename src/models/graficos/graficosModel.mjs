@@ -1,4 +1,4 @@
-import { connection } from '../../config.mjs'
+import { pool } from "../../config.mjs";
 
 class graficosModel {
     static receitaPorCategoria = async (casal, usuario, mes, ano, callback) => {
@@ -7,7 +7,7 @@ class graficosModel {
                                     INNER JOIN icones AS ic ON cat.icone = ic.id
                                         WHERE casal = ? AND tipo = 1 AND cat_sistema != 1`
         const categoriasBD = await new Promise((resolve, reject) => {
-            connection.query(queryCategoria, [casal], (err, results) => {
+            pool.query(queryCategoria, [casal], (err, results) => {
                 if (err) {
                     reject(err)
                 }
@@ -18,7 +18,7 @@ class graficosModel {
         const saldos = await Promise.all(categoriasBD.map(async (categoria) => {
             const saldoPorCategoriaBD = await new Promise((resolve, reject) => {
                 const querySaldoPorCategoria = 'SELECT SUM(valor) AS total_receitas FROM receita WHERE categoria = ? AND casal = ? AND usuario = ? AND mes = ? AND ano = ?';
-                connection.query(querySaldoPorCategoria, [categoria.id, casal, usuario, mes, ano], (err, results) => {
+                pool.query(querySaldoPorCategoria, [categoria.id, casal, usuario, mes, ano], (err, results) => {
                     if (err) {
                         reject(err);
                     }
@@ -43,7 +43,7 @@ class graficosModel {
                                     INNER JOIN icones AS ic ON cat.icone = ic.id
                                         WHERE casal = ? AND tipo = 0 AND cat_sistema != 1`
         const categoriasBD = await new Promise((resolve, reject) => {
-            connection.query(queryCategoria, [casal], (err, results) => {
+            pool.query(queryCategoria, [casal], (err, results) => {
                 if (err) {
                     reject(err)
                 }
@@ -54,7 +54,7 @@ class graficosModel {
         const saldos = await Promise.all(categoriasBD.map(async (categoria) => {
             const saldoPorCategoriaBD = await new Promise((resolve, reject) => {
                 const querySaldoPorCategoria = 'SELECT SUM(valor) AS total_despesas FROM despesa WHERE categoria = ? AND casal = ? AND usuario = ? AND mes = ? AND ano = ? AND tipo = ?';
-                connection.query(querySaldoPorCategoria, [categoria.id, casal, usuario, mes, ano, tipo], (err, results) => {
+                pool.query(querySaldoPorCategoria, [categoria.id, casal, usuario, mes, ano, tipo], (err, results) => {
                     if (err) {
                         reject(err);
                     }

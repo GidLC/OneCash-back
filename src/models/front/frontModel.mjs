@@ -1,20 +1,24 @@
-import { connection } from "../../config.mjs";
+import { pool } from "../../config.mjs";
 
 class frontModel {
+    static buscaCores = async (callback) => {
+        try {
+            const query = 'SELECT id, nome, codigo AS cor FROM cor';
 
-    static buscaCores = (callback) => {
-        const query = 'SELECT id, nome, codigo AS cor FROM cor';
-        connection.query(query, (err, results) => {
-            if (err) {
-                return callback(err, null);
-            }
-            callback(null, results)
-        });
+            pool.query(query, (err, results) => {
+                if (err) {
+                    return callback(err, null);
+                }
+                callback(null, results)
+            });
+        } catch (error) {
+            console.error(`Deu erro`)
+        }
     };
 
     static buscaCorID = (id, callback) => {
         const query = 'SELECT id, nome, codigo AS cor FROM cor WHERE id = ?';
-        connection.query(query, [id], (err, results) => {
+        pool.query(query, [id], (err, results) => {
             if (err) {
                 return callback(err, null);
             }
@@ -24,7 +28,7 @@ class frontModel {
 
     static buscaIcones = (callback) => {
         const query = 'SELECT * FROM icones';
-        connection.query(query, (err, results) => {
+        pool.query(query, (err, results) => {
             if (err) {
                 return callback(err, null)
             }
@@ -34,7 +38,7 @@ class frontModel {
 
     static buscaIconeID = (id, callback) => {
         const query = 'SELECT * FROM icones WHERE id = ?';
-        connection.query(query, [id], (err, results) => {
+        pool.query(query, [id], (err, results) => {
             if (err) {
                 return callback(err, null)
             }

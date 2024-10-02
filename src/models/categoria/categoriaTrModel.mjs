@@ -1,9 +1,9 @@
-import { connection } from "../../config.mjs";
+import { pool } from '../../config.mjs';
 
 class CategoriaTrModel {
     static addCategoriaTr = (nome, tipo, cor, icone, casal, callback) => {
         const query = 'INSERT INTO categoria_tr (nome, tipo, cor, icone, casal, cat_sistema) VALUES (?,?,?,?,?,0)';
-        connection.query(query, [nome, tipo, cor, icone, casal], (err, results) => {
+        pool.query(query, [nome, tipo, cor, icone, casal], (err, results) => {
             if (err) {
                 return callback(err, null)
             }
@@ -17,7 +17,7 @@ class CategoriaTrModel {
                         INNER JOIN cor AS c ON cat.cor = c.id 
                         INNER JOIN icones AS ic ON cat.icone = ic.id
                             WHERE casal = ? AND tipo = ? AND cat_sistema != 1`
-        connection.query(query, [auth, tipo], (err, results) => {
+        pool.query(query, [auth, tipo], (err, results) => {
             if (err) {
                 return callback(err, null)
             }
@@ -27,7 +27,7 @@ class CategoriaTrModel {
 
     static loadCategoriasSistema = (auth, callback) => {
         const query = 'SELECT id, nome FROM categoria_tr WHERE casal = ? AND cat_sistema = 1 ORDER BY tipo'
-        connection.query(query, [auth], (err, results) => {
+        pool.query(query, [auth], (err, results) => {
             if (err) {
                 return callback(err, results)
             }
@@ -37,7 +37,7 @@ class CategoriaTrModel {
 
     static loadCategoriaTrID = (auth, id, callback) => {
         const query = 'SELECT id, nome, tipo, cor, icone FROM categoria_tr where casal = ? AND id = ?';
-        connection.query(query, [auth, id], (err, results) => {
+        pool.query(query, [auth, id], (err, results) => {
             if (err) {
                 return callback(err, null)
             } else if (results.length == 0) {
@@ -52,7 +52,7 @@ class CategoriaTrModel {
     static editCategoriaTr = (auth, id, nome, icone, cor, callback) => {
         console.log(auth, id, nome, icone, cor)
         const query = 'UPDATE categoria_tr SET nome = ?, cor = ?, icone = ? WHERE casal = ? AND id = ?'
-        connection.query(query, [nome, cor, icone, auth, id], (err, results) => {
+        pool.query(query, [nome, cor, icone, auth, id], (err, results) => {
             if (err) {
                 return callback(err, null)
             }
@@ -64,7 +64,7 @@ class CategoriaTrModel {
     //Só se utiliza esse delete caso a categoria não tenha movimentações atribuidas a ela
     static deleteCategoriaTr = (auth, id, callback) => {
         const query = 'DELETE FROM categoria_tr WHERE id = ? AND casal = ?';
-        connection.query(query, [id, auth], (err, results) => {
+        pool.query(query, [id, auth], (err, results) => {
             if (err) {
                 return callback(err, null)
             }
@@ -81,7 +81,7 @@ class CategoriaTrModel {
             //receitas
             const queryReceitas = 'UPDATE receita SET categoria = ? WHERE categoria = ? AND casal = ?'
             await new Promise((resolve, reject) => {
-                connection.query(queryReceitas, [catDestino, catOrigem, auth], (err, results) => {
+                pool.query(queryReceitas, [catDestino, catOrigem, auth], (err, results) => {
                     if (err) {
                         reject(err)
                     }
@@ -91,7 +91,7 @@ class CategoriaTrModel {
 
             const queryDespesas = 'UPDATE despesa SET categoria = ? WHERE categoria = ? AND casal = ?'
             await new Promise((resolve, reject) => {
-                connection.query(queryDespesas, [catDestino, catOrigem, auth], (err, results) => {
+                pool.query(queryDespesas, [catDestino, catOrigem, auth], (err, results) => {
                     if (err) {
                         reject(err)
                     }

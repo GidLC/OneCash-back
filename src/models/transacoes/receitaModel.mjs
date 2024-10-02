@@ -1,4 +1,4 @@
-import { connection } from "../../config.mjs"
+import { pool } from "../../config.mjs";
 import SeparaData from "../../data/SeparaData/SeparaData.mjs";
 
 class ReceitaModel {
@@ -6,7 +6,7 @@ class ReceitaModel {
     static addReceita = async (descricao, valor, usuario, cod_casal, categoria, status, data, banco, tipo, callback) => {
         const query = 'INSERT INTO receita (descricao, valor, usuario, casal, categoria, status, dia, mes, ano, banco, tipo) VALUES (?,?,?,?,?,?,?,?,?,?,?)';
         const objData = await SeparaData(data)
-        connection.query(query, [descricao, valor, usuario, cod_casal, categoria, status, objData.dia, objData.mes, objData.ano, banco, tipo], (err, results) => {
+        pool.query(query, [descricao, valor, usuario, cod_casal, categoria, status, objData.dia, objData.mes, objData.ano, banco, tipo], (err, results) => {
             if (err) {
                 return callback(err, null)
             }
@@ -25,7 +25,7 @@ class ReceitaModel {
                             WHERE rec.usuario = ? AND rec.casal = ? AND rec.mes = ? AND rec.ano = ? AND rec.tipo = 0`
 
         const receitasInd = await new Promise((resolve, reject) => {
-            connection.query(queryInd, [usuario, casal, mes, ano], (err, results) => {
+            pool.query(queryInd, [usuario, casal, mes, ano], (err, results) => {
                 if (err) {
                     reject(err)
                 }
@@ -42,7 +42,7 @@ class ReceitaModel {
                                     WHERE rec.casal = ? AND rec.mes = ? AND rec.ano = ? AND rec.tipo = 1`
 
         const receitasCol = await new Promise((resolve, reject) => {
-            connection.query(queryCol, [casal, mes, ano], (err, results) => {
+            pool.query(queryCol, [casal, mes, ano], (err, results) => {
                 if (err) {
                     reject(err)
                 }
@@ -60,7 +60,7 @@ class ReceitaModel {
                         INNER JOIN banco AS ba ON ba.id = rec.banco
                              WHERE rec.id = ? AND rec.usuario = ? AND rec.casal = ?`;
 
-        connection.query(query, [id, usuario, casal], (err, results) => {
+        pool.query(query, [id, usuario, casal], (err, results) => {
             if (err) {
                 return callback(err, null)
             }
@@ -69,10 +69,10 @@ class ReceitaModel {
         })
     }
 
-    static editReceita = async (casal, usuario, id, descricao, categoria, valor, data, callback) => {
-        const query = `UPDATE receita SET descricao = ?, categoria = ?, valor = ?, dia = ?, mes = ?, ano = ? WHERE casal = ? AND id = ?`
+    static editReceita = async (casal, usuario, tipo, id, descricao, categoria, valor, data, callback) => {
+        const query = `UPDATE receita SET descricao = ?, categoria = ?, valor = ?, tipo = ?, dia = ?, mes = ?, ano = ? WHERE casal = ? AND id = ?`
         const objData = await SeparaData(data)
-        connection.query(query, [descricao, categoria, valor, objData.dia, objData.mes, objData.ano, casal, id], (err, results) => {
+        pool.query(query, [descricao, categoria, valor, tipo, objData.dia, objData.mes, objData.ano, casal, id], (err, results) => {
             if (err) {
                 return callback(err, null)
             }
@@ -84,7 +84,7 @@ class ReceitaModel {
     static deleteReceita = async (id, usuario, casal, callback) => {
         const query = 'DELETE FROM receita WHERE id = ? AND usuario = ? AND casal = ?';
 
-        connection.query(query, [id, usuario, casal], (err, results) => {
+        pool.query(query, [id, usuario, casal], (err, results) => {
             if (err) {
                 return callback(err, null)
             }

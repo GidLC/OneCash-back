@@ -9,19 +9,33 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-const connection = mysql.createConnection({
+const pool = mysql.createPool({
   host: host,
   user: user,
   password: password,
   database: database,
+  waitForConnections: true,
+  connectionLimit: 50,
+  maxIdle: 50, // Conexões ociosas máximas
+  idleTimeout: 60000, // Timeout de conexões ociosas em milissegundos
+  queueLimit: 0, // Sem limite de fila
+  enableKeepAlive: true,
+  keepAliveInitialDelay: 0,
 });
 
-connection.connect((err) => {
-  if (err) {
-    console.error('Erro ao conectar ao banco de dados:', err);
-    return;
+//Testando pool de conexões
+pool.getConnection((err, conn) => {
+  if(err) {
+    console.log(`Não foi possível abri o pool de conexões`);
   }
-  console.log('Conexão ao banco de dados MySQL estabelecida');
-});
+  console.log(`Conexão estabelecida via Pool`);
 
-export { app, connection};
+  setTimeout(() => {
+    pool.releaseConnection(conn)
+    console.log(`Pool liberado`);
+  }, 5000)
+})
+
+
+
+export { app, pool};

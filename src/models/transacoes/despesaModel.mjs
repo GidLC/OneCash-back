@@ -1,4 +1,4 @@
-import { connection } from '../../config.mjs'
+import { pool } from "../../config.mjs";
 import SeparaData from '../../data/SeparaData/SeparaData.mjs';
 
 class DespesaModel {
@@ -6,7 +6,7 @@ class DespesaModel {
         console.log({ descricao, valor, usuario, cod_casal, categoria, status, tipo, data, banco })
         const query = 'INSERT INTO despesa(descricao, valor, usuario, casal, categoria, status, dia, mes, ano, banco, tipo) VALUES (?,?,?,?,?,?,?,?,?,?,?)';
         const objData = await SeparaData(data)
-        connection.query(query, [descricao, valor, usuario, cod_casal, categoria, status, objData.dia, objData.mes, objData.ano, banco, tipo], (err, results) => {
+        pool.query(query, [descricao, valor, usuario, cod_casal, categoria, status, objData.dia, objData.mes, objData.ano, banco, tipo], (err, results) => {
             if (err) {
                 return callback(err, null)
             }
@@ -26,7 +26,7 @@ class DespesaModel {
                 INNER JOIN banco AS ba ON ba.id = des.banco
                     WHERE des.usuario = ? AND des.casal = ? AND des.mes = ? AND des.ano = ? AND des.tipo = ?`;
 
-            connection.query(query, [usuario, casal, mes, ano, tipo], (err, results) => {
+            pool.query(query, [usuario, casal, mes, ano, tipo], (err, results) => {
                 if (err) {
                     return callback(err, null)
                 }
@@ -43,7 +43,7 @@ class DespesaModel {
                 INNER JOIN banco AS ba ON ba.id = des.banco
                     WHERE des.casal = ? AND des.mes = ? AND des.ano = ? AND des.tipo = ?`;
 
-            connection.query(query, [casal, mes, ano, tipo], (err, results) => {
+            pool.query(query, [casal, mes, ano, tipo], (err, results) => {
                 if (err) {
                     return callback(err, null)
                 }
@@ -61,7 +61,7 @@ class DespesaModel {
                             INNER JOIN banco AS ba ON ba.id = des.banco
                                 WHERE des.id = ? AND des.casal = ?`;
 
-        connection.query(query, [id, casal], (err, results) => {
+        pool.query(query, [id, casal], (err, results) => {
             if (err) {
                 return callback(err, null)
             }
@@ -74,7 +74,7 @@ class DespesaModel {
         const query = `UPDATE despesa SET descricao = ?, categoria = ?, valor =?, dia = ?, mes = ?, ano = ? WHERE casal = ? AND id = ?`
         const objData = await SeparaData(data)
         console.log(casal, id, descricao, categoria, valor, objData)
-        connection.query(query, [descricao, categoria, valor, objData.dia, objData.mes, objData.ano, casal, id], (err, results) => {
+        pool.query(query, [descricao, categoria, valor, objData.dia, objData.mes, objData.ano, casal, id], (err, results) => {
             if (err) {
                 return callback(err, null)
             }
@@ -86,7 +86,7 @@ class DespesaModel {
     static deleteDespesa = async (casal, id, callback) => {
         const query = 'DELETE FROM despesa WHERE casal = ? AND id = ?';
 
-        connection.query(query, [casal, id], (err, results) => {
+        pool.query(query, [casal, id], (err, results) => {
             if (err) {
                 return callback(err, null)
             }

@@ -1,4 +1,3 @@
-import { connection } from "../../config.mjs";
 import cheerio from 'cheerio';
 
 class compraModel {
