@@ -3,6 +3,7 @@ import * as crypto from 'crypto'
 import enviaEmail from "../../data/enviaEmail/enviaEmail.mjs";
 import EmailParceiro from "../../data/emails/Cadastro/EmailParceiro.mjs";
 import EmailCadastro from "../../data/emails/Cadastro/EmailCadastro.mjs";
+import enviaWhats from '../../data/enviaWhats/enviaWhats.mjs';
 
 class AuthModel {
 
@@ -13,10 +14,11 @@ class AuthModel {
     //categorias de despesa padrão: Alimentação, Moradia, transporte, saúde, educação, lazer, roupas e acessórios, água/luz/internet, despesas diversas
     //categorias de receita padrão: Salário, rendimentos, presentes, vales
 
-    const queryUsuario = 'INSERT INTO usuario (nome, email, senha, email_parceiro, casal, dt_criacao) VALUES (?, ?, ?, ?, ?, ?)';
+    const queryUsuario = 'INSERT INTO usuario (nome, email, senha, email_parceiro, casal, dt_criacao, fone) VALUES (?, ?, ?, ?, ?, ?, ?)';
 
+    //Cria cadastro do usuário principal
     const usuario = await new Promise((resolve, reject) => {
-      pool.query(queryUsuario, [nome, email, senhaHash, email_parceiro, codigoCasal, dt_criacao], async (err, results) => {
+      pool.query(queryUsuario, [nome, email, senhaHash, email_parceiro, codigoCasal, dt_criacao, fone], async (err, results) => {
         if (err) {
           reject(err)
         }
@@ -30,7 +32,7 @@ class AuthModel {
           "Cadastro no OneCash",
           EmailParceiro(nome, codigoCasal))
 
-        //await enviaWhats(fone, `Você acaba de realizar o cadastro no app OneCash, para que seu parceiro se vincule a você ele precisa do código: ${codigoCasal}`)
+        await enviaWhats(fone, `Você acaba de realizar o cadastro no app OneCash, para que seu parceiro se vincule a você ele precisa do código: ${codigoCasal}`)
 
         resolve(results)
       });
@@ -38,6 +40,7 @@ class AuthModel {
 
     const userId = usuario.insertId;
 
+    //Cria tabela para vínculo do casal
     const queryCasal = 'INSERT INTO casal (cod_casal, usuario_princ) VALUES (?, ?)';
     await new Promise((resolve, reject) => {
       pool.query(queryCasal, [codigoCasal, userId], (err, results) => {
@@ -48,6 +51,7 @@ class AuthModel {
       });
     });
 
+    //Insere categorias padrões
     const queryCategoria = `
       INSERT INTO categoria_tr (nome, tipo, cor, icone, casal) VALUES("Alimentação", 0, 2, 21, ?);
       INSERT INTO categoria_tr (nome, tipo, cor, icone, casal) VALUES("Moradia", 0, 3, 27, ?);
@@ -82,6 +86,7 @@ class AuthModel {
       console.error("Erro ao inserir categorias:", error);
     }
 
+    //Cria contas bancárias padrão
     const queryBancos = `
                           INSERT INTO banco (nome, tipo, saldo_inicial, casal, usuario) VALUES ("Carteira", 0, 0, ?, ?);
                           INSERT INTO banco (nome, tipo, saldo_inicial, casal, usuario) VALUES ("Nossa Conta", 1, 0, ?, ?);`
@@ -121,7 +126,7 @@ class AuthModel {
   }
 
   //Realizar uma validação de vinculação mais segura, como solicitar o email do parceiro principal
-  static vincCadastro = async (nome, email, senha, cod_casal, email_parceiro, dt_criacao, id_usuario_princ, callback) => {
+  static vincCadastro = async (nome, email, senha, cod_casal, email_parceiro, dt_criacao, id_usuario_princ, fone, callback) => {
     const senhaHash = crypto.createHash('sha256').update(senha).digest('hex');
     //verificar se o email a ser vinculado é o mesmo que está cadastrado no usuário principal
     const queryParceiro = 'SELECT * FROM usuario WHERE email_parceiro = ?'
@@ -139,9 +144,9 @@ class AuthModel {
     })
 
     //Insere usuário na tabela
-    const queryUsuario = 'INSERT INTO usuario (nome, email, senha, casal, email_parceiro, dt_criacao) VALUES (?, ?, ?, ?, ?, ?)';
+    const queryUsuario = 'INSERT INTO usuario (nome, email, senha, casal, email_parceiro, dt_criacao, fone) VALUES (?, ?, ?, ?, ?, ?, ?)';
     const usuarioResult = await new Promise((resolve, reject) => {
-      pool.query(queryUsuario, [nome, email, senhaHash, cod_casal, email_parceiro, dt_criacao], (err, results) => {
+      pool.query(queryUsuario, [nome, email, senhaHash, cod_casal, email_parceiro, dt_criacao, fone], (err, results) => {
         if (err) {
           reject(err);
         }
@@ -180,103 +185,112 @@ class AuthModel {
       console.error("Erro ao inserir Banco:", error);
     }
 
+    enviaWhats(fone, `Você acaba de se vincular como parceira de ${parceiro.nome} no aplicativo OneCash. Aproveitem a aplicação e sucesso`)
     return callback(null, casalResult);
   }
 
   static loginUsuario = async (email, senha, callback) => {
-    const senhaHash = crypto.createHash('sha256').update(senha).digest('hex')
-    const data = new Date()
-    const hoje = data.toISOString()
+    try {
+      const senhaHash = crypto.createHash('sha256').update(senha).digest('hex')
+      const data = new Date()
+      const hoje = data.toISOString()
 
-    //Verifica a existência do usuário
-    const queryLogin = `SELECT * FROM usuario where email = ? AND senha = ?`;
-    const login = await new Promise((resolve, reject) => {
-      pool.query(queryLogin, [email, senhaHash], (err, results) => {
-        if (err) {
-          reject(err)
-        } else if (results.length == 0) {
-          err = `Usuário não encontrado`
-          return callback(err, null)
-        } else {
-          resolve(results)
-        }
+      //Verifica a existência do usuário
+      const queryLogin = `SELECT * FROM usuario where email = ? AND senha = ?`;
+      const login = await new Promise((resolve, reject) => {
+        pool.query(queryLogin, [email, senhaHash], (err, results) => {
+          if (err) {
+            reject(err)
+          } else if (results.length == 0) {
+            err = `Usuário não encontrado`
+            return callback(err, null)
+          } else {
+            resolve(results)
+          }
+        })
       })
-    })
 
-    //Verifica a existência de uma casal vinculado ao usuário
-    const queryCasal = `SELECT * FROM casal WHERE usuario_princ = ? OR usuario_sec = ?`;
-    const casal = await new Promise((resolve, reject) => {
-      pool.query(queryCasal, [login[0].id, login[0].id], (err, results) => {
-        if (err) {
-          reject(err)
-        } else if (results.length == 0) {
-          err = `Você e seu parceiro não formaram um casal em nosso app`;
-          return callback(err, null)
-        } else {
-          resolve(results)
-        }
+      //Verifica a existência de uma casal vinculado ao usuário
+      const queryCasal = `SELECT * FROM casal WHERE usuario_princ = ? OR usuario_sec = ?`;
+      const casal = await new Promise((resolve, reject) => {
+        pool.query(queryCasal, [login[0].id, login[0].id], (err, results) => {
+          if (err) {
+            reject(err)
+          } else if (results.length == 0) {
+            err = `Você e seu parceiro não formaram um casal em nosso app`;
+            return callback(err, null)
+          } else {
+            resolve(results)
+          }
+        })
       })
-    })
 
-    //registra login do usuário
-    const queryDataLogin = 'UPDATE usuario SET ultimo_acesso = ? WHERE id = ?';
-    await new Promise((resolve, reject) => {
-      pool.query(queryDataLogin, [hoje, login[0].id], (err, results) => {
-        if (err) {
-          reject(err)
-        } else {
-          resolve(results)
-        }
-      })
-    })
-
-    if (login[0].id == casal[0].usuario_princ) {
-      const id_parceiro = casal[0].usuario_sec
-      const queryParceiro = `SELECT * FROM usuario where id = ?`;
-      const parceiro = await new Promise((resolve, reject) => {
-        pool.query(queryParceiro, [id_parceiro], (err, results) => {
+      //registra login do usuário
+      const queryDataLogin = 'UPDATE usuario SET ultimo_acesso = ? WHERE id = ?';
+      await new Promise((resolve, reject) => {
+        pool.query(queryDataLogin, [hoje, login[0].id], (err, results) => {
           if (err) {
             reject(err)
           } else {
             resolve(results)
           }
         })
-      });
-      console.log(parceiro[0].nome)
-
-      return callback(null, {
-        id: login[0].id,
-        nome: login[0].nome,
-        email: login[0].email,
-        fone: login[0].fone,
-        email_parceiro: login[0].email_parceiro,
-        cod_casal: casal[0].cod_casal,
-        id_parceiro: id_parceiro,
-        nome_parceiro: parceiro[0].nome
       })
-    } else {
-      const id_parceiro = casal[0].usuario_princ
-      const queryParceiro = `SELECT * FROM usuario where id = ?`;
-      const parceiro = await new Promise((resolve, reject) => {
-        pool.query(queryParceiro, [id_parceiro], (err, results) => {
-          if (err) {
-            reject(err)
-          } else {
-            resolve(results)
-          }
-        })
-      });
 
-      return callback(null, {
-        id: login[0].id,
-        nome: login[0].nome,
-        email: login[0].email,
-        fone: login[0].fone,
-        email_parceiro: login[0].email_parceiro,
-        cod_casal: casal[0].cod_casal,
-        id_parceiro: id_parceiro,
-        nome_parceiro: parceiro[0].nome
-      })
+      if (casal[0].usuario_sec !== null) {
+        if (login[0].id == casal[0].usuario_princ) {
+          const id_parceiro = casal[0].usuario_sec
+          const queryParceiro = `SELECT * FROM usuario where id = ?`;
+          const parceiro = await new Promise((resolve, reject) => {
+            pool.query(queryParceiro, [id_parceiro], (err, results) => {
+              if (err) {
+                reject(err)
+              } else {
+                resolve(results)
+              }
+            })
+          });
+          //console.log(parceiro[0].nome)
+  
+          return callback(null, {
+            id: login[0].id,
+            nome: login[0].nome,
+            email: login[0].email,
+            fone: login[0].fone,
+            email_parceiro: login[0].email_parceiro,
+            cod_casal: casal[0].cod_casal,
+            id_parceiro: id_parceiro,
+            nome_parceiro: parceiro[0].nome
+          })
+        } else {
+          const id_parceiro = casal[0].usuario_princ
+          const queryParceiro = `SELECT * FROM usuario where id = ?`;
+          const parceiro = await new Promise((resolve, reject) => {
+            pool.query(queryParceiro, [id_parceiro], (err, results) => {
+              if (err) {
+                reject(err)
+              } else {
+                resolve(results)
+              }
+            })
+          });
+  
+          return callback(null, {
+            id: login[0].id,
+            nome: login[0].nome,
+            email: login[0].email,
+            fone: login[0].fone,
+            email_parceiro: login[0].email_parceiro,
+            cod_casal: casal[0].cod_casal,
+            id_parceiro: id_parceiro,
+            nome_parceiro: parceiro[0].nome
+          })
+        }
+      } else {
+        return callback({message: "Usuário sem parceiro vinculado a ele"})
+      }
+    } catch (error) {
+      throw error
     }
   }
 
@@ -354,7 +368,7 @@ class AuthModel {
         return callback(err, null)
       }
 
-      
+
       return callback(null, results)
     })
   }

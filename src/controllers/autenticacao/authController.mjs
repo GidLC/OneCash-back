@@ -6,7 +6,7 @@ const loginUsuario = (req, res) => {
   AuthModel.loginUsuario(email, senha, (err, resultado) => {
     if (err) {
       console.error('Erro ao encontrar  usuário:', err);
-      return res.status(500).json({ error: 'Erro ao encontrar o usuário' });
+      return res.status(500).json(`Erro ao realizar login: ${err.message}`);
     }
     res.status(200).json({ message: 'Usuário encontrado com sucesso', resultado });
   });
@@ -26,7 +26,7 @@ const cadastroUsuario = (req, res) => {
 };
 
 const buscaCadastro = (req, res) => {
-  const { codigo } = req.params;
+  const { codigo } = req.body;
   AuthModel.buscaCadastro(codigo, (err, results) => {
     if (err) {
       console.error('Erro ao encontrar cadastro:', err);
@@ -43,9 +43,9 @@ const buscaCadastro = (req, res) => {
 
 const vincCadastro = (req, res) => {
   console.log(req.body)
-  const { nome, email, senha, cod_casal, email_parceiro, dt_criacao, id_usuario_princ } = req.body;
+  const { nome, email, senha, cod_casal, email_parceiro, dt_criacao, id_usuario_princ, fone } = req.body;
 
-  AuthModel.vincCadastro(nome, email, senha, cod_casal, email_parceiro, dt_criacao, id_usuario_princ, (err, resultado) => {
+  AuthModel.vincCadastro(nome, email, senha, cod_casal, email_parceiro, dt_criacao, id_usuario_princ, fone, (err, resultado) => {
     if (err) {
       console.error('Erro ao vincular usuário :', err);
       return res.status(500).json({ error: err });

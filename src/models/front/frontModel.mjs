@@ -12,7 +12,7 @@ class frontModel {
                 callback(null, results)
             });
         } catch (error) {
-            console.error(`Deu erro`)
+            console.error(`Deu erro: ${error}`)
         }
     };
 
