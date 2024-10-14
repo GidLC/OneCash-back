@@ -6,7 +6,7 @@ const loginUsuario = (req, res) => {
   AuthModel.loginUsuario(email, senha, (err, resultado) => {
     if (err) {
       console.error('Erro ao encontrar  usuário:', err);
-      return res.status(500).json(`Erro ao realizar login: ${err.message}`);
+      return res.status(500).json({message: `Erro ao realizar login: ${err}`});
     }
     res.status(200).json({ message: 'Usuário encontrado com sucesso', resultado });
   });
