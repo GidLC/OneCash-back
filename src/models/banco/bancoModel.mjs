@@ -102,7 +102,7 @@ class BancoModel {
                     const saldoInicial = saldoInicialBD[0].saldo_inicial;
 
                     //Receitas
-                    const queryreceitas = 'SELECT SUM(valor) AS total_receitas FROM receita WHERE banco = ? AND casal = ? AND usuario = ?';
+                    const queryreceitas = 'SELECT SUM(valor) AS total_receitas FROM receita WHERE banco = ? AND casal = ? AND usuario = ? AND status = 1';
                     const receitasBD = await new Promise((resolve, reject) => {
                         pool.query(queryreceitas, [banco.id, casal, usuario], (err, results) => {
                             if (err) {
@@ -115,7 +115,7 @@ class BancoModel {
                     const receitas = receitasBD[0].total_receitas || 0;
 
                     //Depesas
-                    const queryDespesas = 'SELECT SUM(valor) AS total_despesas FROM despesa WHERE banco = ? AND casal = ? AND usuario = ?';
+                    const queryDespesas = 'SELECT SUM(valor) AS total_despesas FROM despesa WHERE banco = ? AND casal = ? AND usuario = ? AND status = 1';
                     const despesasBD = await new Promise((resolve, reject) => {
                         pool.query(queryDespesas, [banco.id, casal, usuario], (err, results) => {
                             if (err) {
@@ -173,6 +173,7 @@ class BancoModel {
                 });
 
                 const bancosComSaldo = await Promise.all(bancosBD.map(async (banco) => {
+                    //Saldo inicial
                     const saldoInicialBD = await new Promise((resolve, reject) => {
                         const querysaldoInicial = 'SELECT saldo_inicial FROM banco WHERE id = ? AND casal = ? AND tipo = 1';
                         pool.query(querysaldoInicial, [banco.id, casal], (err, results) => {
@@ -185,7 +186,8 @@ class BancoModel {
 
                     const saldoInicial = saldoInicialBD[0].saldo_inicial;
 
-                    const queryreceitas = 'SELECT SUM(valor) AS total_receitas FROM receita WHERE banco = ? AND casal = ?';
+                    //Receitas
+                    const queryreceitas = 'SELECT SUM(valor) AS total_receitas FROM receita WHERE banco = ? AND casal = ? AND status = 1';
                     const receitasBD = await new Promise((resolve, reject) => {
                         pool.query(queryreceitas, [banco.id, casal], (err, results) => {
                             if (err) {
@@ -197,7 +199,7 @@ class BancoModel {
 
                     const receitas = receitasBD[0].total_receitas || 0;
 
-                    const queryDespesas = 'SELECT SUM(valor) AS total_despesas FROM despesa WHERE banco = ? AND casal = ?';
+                    const queryDespesas = 'SELECT SUM(valor) AS total_despesas FROM despesa WHERE banco = ? AND casal = ? AND status = 1';
                     const despesasBD = await new Promise((resolve, reject) => {
                         pool.query(queryDespesas, [banco.id, casal], (err, results) => {
                             if (err) {
@@ -280,6 +282,8 @@ class BancoModel {
             return callback(error, null);
         }
     }
+
+    //Criar função para editar banco
 }
 
 export default BancoModel

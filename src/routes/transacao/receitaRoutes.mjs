@@ -7,5 +7,6 @@ receitaRouter.get('/readReceita', receitaController.readReceita)
 receitaRouter.delete('/deleteReceita', receitaController.deleteReceita)
 receitaRouter.get('/readReceitaID', receitaController.readReceitaID)
 receitaRouter.put('/editReceita', receitaController.editReceita)
+receitaRouter.put('/efetivaReceita', receitaController.efetivaReceita)
 
 export default receitaRouter

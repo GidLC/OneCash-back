@@ -2,7 +2,6 @@ import ReceitaModel from "../../models/transacoes/receitaModel.mjs";
 
 const addReceita = (req, res) => {
   const { descricao, valor, categoria, status, data, banco, tipo } = req.body;
-  console.log(data)
   const cod_casal = req.header('auth');
   const usuario = req.header('usuario')
   ReceitaModel.addReceita(descricao, valor, usuario, cod_casal, categoria, status, data, banco, tipo, (err, resultado) => {
@@ -48,9 +47,9 @@ const readReceitaID = (req, res) => {
 const editReceita = (req, res) => {
   const casal = req.header('auth');
   const usuario = req.header('usuario');
-  const {id, descricao, categoria, valor, data, tipo} = req.body
+  const {id, descricao, categoria, valor, data, tipo, status} = req.body
 
-  ReceitaModel.editReceita(casal, usuario, tipo, id, descricao, categoria, valor, data, (err, results) => {
+  ReceitaModel.editReceita(casal, usuario, tipo, id, descricao, categoria, valor, data, status, (err, results) => {
     if (err) {
       console.error('Erro ao editar a receita', err);
       return res.status(500).json({ error: 'Erro ao editar a receita' });
@@ -75,5 +74,19 @@ const deleteReceita = (req, res) => {
   })
 }
 
+const efetivaReceita = (req, res) => {
+  const casal = req.header('auth');
+  const receitaId = req.header('id');
 
-export default { addReceita, readReceita, deleteReceita, readReceitaID, editReceita }
+  ReceitaModel.efetivaReceita(casal, receitaId, (err, results) => {
+    if (err) {
+      console.error('Erro ao efetivar receita', err);
+      return res.status(500).json({message: `Não foi possível efetivar a receita: ${err}`});
+    }
+
+    res.status(200).json({message: 'Receita efetivada com sucesso', results});
+  })
+}
+
+
+export default { addReceita, readReceita, deleteReceita, readReceitaID, editReceita, efetivaReceita }

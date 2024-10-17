@@ -1,10 +1,11 @@
 import { pool } from "../../config.mjs";
 
 class SaldosModel {
+    //Função para cálculo de todos os saldos da aplicação - saldo estático
     static saldoGeral = async (casal, usuario, callback) => {
         try {
             //Saldos individuais
-            //seleciona todos os bancos
+            //Seleciona todos os bancos(Bancos não arquivados)
             const queryBancoInd = 'SELECT * FROM banco WHERE casal = ? AND usuario = ? AND tipo = 0 AND arquivo = 0';
             const bancosBDInd = await new Promise((resolve, reject) => {
                 pool.query(queryBancoInd, [casal, usuario], (err, results) => {
@@ -30,7 +31,7 @@ class SaldosModel {
 
                 const saldoInicial = saldoInicialBD[0].saldo_inicial;
                 //receitas
-                const queryreceitas = 'SELECT SUM(valor) AS total_receitas FROM receita WHERE banco = ? AND casal = ? AND usuario = ?';
+                const queryreceitas = 'SELECT SUM(valor) AS total_receitas FROM receita WHERE banco = ? AND casal = ? AND usuario = ? AND status = 1';
                 const receitasBD = await new Promise((resolve, reject) => {
                     pool.query(queryreceitas, [banco.id, casal, usuario], (err, results) => {
                         if (err) {
@@ -42,7 +43,8 @@ class SaldosModel {
 
                 const receitas = receitasBD[0].total_receitas || 0;
 
-                const queryDespesas = 'SELECT SUM(valor) AS total_despesas FROM despesa WHERE banco = ? AND casal = ? AND usuario = ?';
+                //Despesas
+                const queryDespesas = 'SELECT SUM(valor) AS total_despesas FROM despesa WHERE banco = ? AND casal = ? AND usuario = ?AND status = 1';
                 const despesasBD = await new Promise((resolve, reject) => {
                     pool.query(queryDespesas, [banco.id, casal, usuario], (err, results) => {
                         if (err) {
@@ -110,7 +112,7 @@ class SaldosModel {
 
                 const saldoInicial = saldoInicialBD[0].saldo_inicial;
 
-                const queryreceitas = 'SELECT SUM(valor) AS total_receitas FROM receita WHERE banco = ? AND casal = ?';
+                const queryreceitas = 'SELECT SUM(valor) AS total_receitas FROM receita WHERE banco = ? AND casal = ? AND status = 1';
                 const receitasBD = await new Promise((resolve, reject) => {
                     pool.query(queryreceitas, [banco.id, casal], (err, results) => {
                         if (err) {
@@ -122,7 +124,7 @@ class SaldosModel {
 
                 const receitas = receitasBD[0].total_receitas || 0;
 
-                const queryDespesas = 'SELECT SUM(valor) AS total_despesas FROM despesa WHERE banco = ? AND casal = ?';
+                const queryDespesas = 'SELECT SUM(valor) AS total_despesas FROM despesa WHERE banco = ? AND casal = ? AND status = 1';
                 const despesasBD = await new Promise((resolve, reject) => {
                     pool.query(queryDespesas, [banco.id, casal], (err, results) => {
                         if (err) {
@@ -206,7 +208,7 @@ class SaldosModel {
                     const saldoMensal = Array(12).fill(0);
 
                     //Busca todas receitas dos bancos
-                    const queryReceitas = 'SELECT SUM(valor) AS total, mes FROM receita WHERE banco = ? AND casal = ? AND ano = ? GROUP BY mes ORDER BY mes';
+                    const queryReceitas = 'SELECT SUM(valor) AS total, mes FROM receita WHERE banco = ? AND casal = ? AND ano = ? AND status = 1 GROUP BY mes ORDER BY mes';
                     const receitasBD = await new Promise((resolve, reject) => {
                         pool.query(queryReceitas, [banco.id, casal, ano], (err, results) => {
                             if (err) {
@@ -221,7 +223,7 @@ class SaldosModel {
                     });
 
                     //Busca todas despesas do banco
-                    const queryDespesas = 'SELECT SUM(valor) AS total, mes FROM despesa WHERE banco = ? AND casal = ? AND ano = ? GROUP BY mes ORDER BY mes';
+                    const queryDespesas = 'SELECT SUM(valor) AS total, mes FROM despesa WHERE banco = ? AND casal = ? AND ano = ? AND status = 1 GROUP BY mes ORDER BY mes';
                     const despesasBD = await new Promise((resolve, reject) => {
                         pool.query(queryDespesas, [banco.id, casal, ano], (err, results) => {
                             if (err) {

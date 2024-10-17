@@ -70,11 +70,11 @@ class DespesaModel {
         })
     }
 
-    static editDespesa = async (casal, id, descricao, categoria, valor, data, callback) => {
-        const query = `UPDATE despesa SET descricao = ?, categoria = ?, valor =?, dia = ?, mes = ?, ano = ? WHERE casal = ? AND id = ?`
+    static editDespesa = async (casal, id, descricao, categoria, valor, data, tipo, status, callback) => {
+        const query = `UPDATE despesa SET descricao = ?, categoria = ?, valor =?, dia = ?, mes = ?, ano = ?, tipo = ?, status = ? WHERE casal = ? AND id = ?`
         const objData = await SeparaData(data)
         console.log(casal, id, descricao, categoria, valor, objData)
-        pool.query(query, [descricao, categoria, valor, objData.dia, objData.mes, objData.ano, casal, id], (err, results) => {
+        pool.query(query, [descricao, categoria, valor, objData.dia, objData.mes, objData.ano, tipo, status, casal, id], (err, results) => {
             if (err) {
                 return callback(err, null)
             }
@@ -87,6 +87,19 @@ class DespesaModel {
         const query = 'DELETE FROM despesa WHERE casal = ? AND id = ?';
 
         pool.query(query, [casal, id], (err, results) => {
+            if (err) {
+                return callback(err, null)
+            }
+
+            return callback(null, results)
+        })
+    }
+
+    static efetivaDespesa = async (casal, despesaId, callback) => {
+        //Verificar se a despesa já está efetivada
+        const query = 'UPDATE despesa SET status = 1 WHERE casal = ? AND id = ?';
+
+        pool.query(query, [casal, despesaId], (err, results) => {
             if (err) {
                 return callback(err, null)
             }

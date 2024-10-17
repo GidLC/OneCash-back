@@ -45,9 +45,9 @@ const readDespesaID = (req, res) => {
 
 const editDespesa = (req, res) => {
     const casal = req.header('auth');
-    const { id, descricao, categoria, valor, data } = req.body
+    const { id, descricao, categoria, valor, data, tipo, status } = req.body
 
-    DespesaModel.editDespesa(casal, id, descricao, categoria, valor, data, (err, results) => {
+    DespesaModel.editDespesa(casal, id, descricao, categoria, valor, data, tipo, status, (err, results) => {
         if (err) {
             console.error('Erro ao editar a despesa', err);
             return res.status(500).json({ error: 'Erro ao editar a despesa' });
@@ -70,5 +70,18 @@ const deleteDespesa = (req, res) => {
     })
 }
 
+const efetivaDespesa = (req, res) => {
+    const casal = req.header('auth');
+    const despesaId = req.header('id');
 
-export default { addDespesa, readDespesa, deleteDespesa, readDespesaID, editDespesa }
+    DespesaModel.efetivaDespesa(casal, despesaId, (err, results) => {
+        if (err) {
+            console.error(`Erro ao efetivar despesa: ${err}`);
+            return res.status(500).json({ error: 'Erro ao efetivar despesa' });
+        }
+        res.status(200).json({ message: 'Despesa efetivada com sucesso', results });
+    });
+}
+
+
+export default { addDespesa, readDespesa, deleteDespesa, readDespesaID, editDespesa, efetivaDespesa }

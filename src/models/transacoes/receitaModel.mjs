@@ -15,7 +15,6 @@ class ReceitaModel {
     }
 
     static readReceita = async (usuario, casal, mes, ano, callback) => {
-        console.log({usuario, casal, mes, ano})
         const queryInd = `SELECT rec.id, rec.descricao, rec.valor, rec.dia, rec.mes, rec.ano, cat.nome AS nome_categoria, 
                        ic.ion_nome AS nome_icone, cor.codigo AS cod_cor, ba.nome AS nome_banco, cat.tipo AS tipo_categoria FROM receita as rec
                         INNER JOIN categoria_tr AS cat ON cat.id = rec.categoria
@@ -24,6 +23,7 @@ class ReceitaModel {
                         INNER JOIN banco AS ba ON ba.id = rec.banco
                             WHERE rec.usuario = ? AND rec.casal = ? AND rec.mes = ? AND rec.ano = ? AND rec.tipo = 0`
 
+        //Receitas individuais
         const receitasInd = await new Promise((resolve, reject) => {
             pool.query(queryInd, [usuario, casal, mes, ano], (err, results) => {
                 if (err) {
@@ -40,7 +40,7 @@ class ReceitaModel {
                                 INNER JOIN cor ON cor.id = cat.cor
                                 INNER JOIN banco AS ba ON ba.id = rec.banco
                                     WHERE rec.casal = ? AND rec.mes = ? AND rec.ano = ? AND rec.tipo = 1`
-
+        //Entende-se receitas coletivas como os ajustes de saldo dos bancos coletivos
         const receitasCol = await new Promise((resolve, reject) => {
             pool.query(queryCol, [casal, mes, ano], (err, results) => {
                 if (err) {
@@ -69,10 +69,10 @@ class ReceitaModel {
         })
     }
 
-    static editReceita = async (casal, usuario, tipo, id, descricao, categoria, valor, data, callback) => {
-        const query = `UPDATE receita SET descricao = ?, categoria = ?, valor = ?, tipo = ?, dia = ?, mes = ?, ano = ? WHERE casal = ? AND id = ?`
+    static editReceita = async (casal, usuario, tipo, id, descricao, categoria, valor, data, status, callback) => {
+        const query = `UPDATE receita SET descricao = ?, categoria = ?, valor = ?, tipo = ?, dia = ?, mes = ?, ano = ?, status = ? WHERE casal = ? AND id = ?`
         const objData = await SeparaData(data)
-        pool.query(query, [descricao, categoria, valor, tipo, objData.dia, objData.mes, objData.ano, casal, id], (err, results) => {
+        pool.query(query, [descricao, categoria, valor, tipo, objData.dia, objData.mes, objData.ano, status, casal, id], (err, results) => {
             if (err) {
                 return callback(err, null)
             }
@@ -90,6 +90,18 @@ class ReceitaModel {
             }
 
             return callback(null, results)
+        })
+    }
+
+    static efetivaReceita = async (casal, receitaId, callback) => {
+        const query = 'UPDATE receita SET status = 1 WHERE casal = ? AND id = ?';
+
+        pool.query(query, [casal, receitaId], (err, results) => {
+            if (err) {
+                return callback(err, null);
+            }
+
+            return callback(null, results);
         })
     }
 
