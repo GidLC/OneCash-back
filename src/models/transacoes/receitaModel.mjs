@@ -15,7 +15,7 @@ class ReceitaModel {
     }
 
     static readReceita = async (usuario, casal, mes, ano, callback) => {
-        const queryInd = `SELECT rec.id, rec.descricao, rec.valor, rec.dia, rec.mes, rec.ano, cat.nome AS nome_categoria, 
+        const queryInd = `SELECT rec.id, rec.descricao, rec.valor, rec.dia, rec.mes, rec.ano, rec.status, cat.nome AS nome_categoria, 
                        ic.ion_nome AS nome_icone, cor.codigo AS cod_cor, ba.nome AS nome_banco, cat.tipo AS tipo_categoria FROM receita as rec
                         INNER JOIN categoria_tr AS cat ON cat.id = rec.categoria
                         INNER JOIN icones AS ic ON ic.id = cat.icone
@@ -33,7 +33,7 @@ class ReceitaModel {
             })
         })
 
-        const queryCol = `SELECT rec.id, rec.descricao, rec.valor, rec.dia, rec.mes, rec.ano, cat.nome AS nome_categoria, 
+        const queryCol = `SELECT rec.id, rec.descricao, rec.valor, rec.dia, rec.mes, rec.ano, rec.status, cat.nome AS nome_categoria, 
                             ic.ion_nome AS nome_icone, cor.codigo AS cod_cor, ba.nome AS nome_banco, cat.tipo AS tipo_categoria FROM receita as rec
                                 INNER JOIN categoria_tr AS cat ON cat.id = rec.categoria
                                 INNER JOIN icones AS ic ON ic.id = cat.icone
@@ -55,7 +55,7 @@ class ReceitaModel {
     }
 
     static readReceitaID = async (id, usuario, casal, callback) => {
-        const query = `SELECT rec.id, rec.descricao, rec.valor, rec.tipo, rec.dia, rec.mes, rec.ano, cat.id AS id_categoria, ba.id AS id_banco FROM receita as rec
+        const query = `SELECT rec.id, rec.descricao, rec.valor, rec.tipo, rec.dia, rec.mes, rec.ano, rec.status, cat.id AS id_categoria, ba.id AS id_banco FROM receita as rec
                         INNER JOIN categoria_tr AS cat ON cat.id = rec.categoria
                         INNER JOIN banco AS ba ON ba.id = rec.banco
                              WHERE rec.id = ? AND rec.usuario = ? AND rec.casal = ?`;

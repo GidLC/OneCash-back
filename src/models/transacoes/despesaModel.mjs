@@ -55,7 +55,7 @@ class DespesaModel {
     }
 
     static readDespesaID = async (id, casal, callback) => {
-        const query = `SELECT des.id, des.descricao, des.valor, des.tipo, des.dia, des.mes, des.ano, cat.id AS id_categoria, cat.nome AS nome_categoria, 
+        const query = `SELECT des.id, des.descricao, des.valor, des.tipo, des.dia, des.mes, des.ano, des.status, cat.id AS id_categoria, cat.nome AS nome_categoria, 
                         ba.id AS id_banco, ba.nome AS nome_banco FROM despesa AS des
                             INNER JOIN categoria_tr AS cat ON cat.id = des.categoria
                             INNER JOIN banco AS ba ON ba.id = des.banco
