@@ -1,11 +1,11 @@
 import DespesaModel from "../../models/transacoes/despesaModel.mjs";
 
 const addDespesa = (req, res) => {
-    const { descricao, valor, categoria, status, data, banco, tipo } = req.body;
+    const { descricao, valor, categoria, status, data, banco, tipo, fixa } = req.body;
     const cod_casal = req.header('auth');
     const usuario = req.header('usuario')
 
-    DespesaModel.addDespesa(descricao, valor, usuario, cod_casal, categoria, status, data, banco, tipo, (err, resultado) => {
+    DespesaModel.addDespesa(descricao, valor, usuario, cod_casal, categoria, status, data, banco, tipo, fixa, (err, resultado) => {
         if (err) {
             console.error('Erro ao cadastrar despesa:', err);
             return res.status(500).json({ error: 'Erro ao cadastrar despesa' })
@@ -20,8 +20,9 @@ const readDespesa = (req, res) => {
     const mes = req.header('mes');
     const ano = req.header('ano');
     const tipo = req.header('tipo');
+    const fixa = req.header('fixa');
 
-    DespesaModel.readDespesa(usuario, casal, mes, ano, tipo, (err, results) => {
+    DespesaModel.readDespesa(usuario, casal, mes, ano, parseInt(tipo), parseInt(fixa), (err, results) => {
         if (err) {
             console.error('Erro ao encontrar despesas:', err);
             return res.status(500).json({ error: 'Erro ao encontrar despesas' });
@@ -33,8 +34,9 @@ const readDespesa = (req, res) => {
 const readDespesaID = (req, res) => {
     const id = req.header('id');
     const casal = req.header('auth');
+    const fixa = req.header('fixa');
 
-    DespesaModel.readDespesaID(id, casal, (err, results) => {
+    DespesaModel.readDespesaID(id, casal, fixa, (err, results) => {
         if (err) {
             console.error('Erro ao encontrar despesa:', err);
             return res.status(500).json({ error: 'Erro ao encontrar despesa' });
@@ -45,9 +47,10 @@ const readDespesaID = (req, res) => {
 
 const editDespesa = (req, res) => {
     const casal = req.header('auth');
+    const fixa = req.header('fixa');
     const { id, descricao, categoria, valor, data, tipo, status } = req.body
 
-    DespesaModel.editDespesa(casal, id, descricao, categoria, valor, data, tipo, status, (err, results) => {
+    DespesaModel.editDespesa(casal, id, descricao, categoria, valor, data, tipo, status, fixa, (err, results) => {
         if (err) {
             console.error('Erro ao editar a despesa', err);
             return res.status(500).json({ error: 'Erro ao editar a despesa' });
@@ -57,11 +60,28 @@ const editDespesa = (req, res) => {
     })
 }
 
+const editDespesaFixa = (req, res) => {
+    const casal = req.header('auth');
+    const pendentes = req.header('pend');
+    const { id_fixo, descricao, categoria, valor, data, tipo, status } = req.body
+
+    DespesaModel.editDespesaFixa(casal, id_fixo, descricao, categoria, valor, data, tipo, status, pendentes, (err, results) => {
+        if (err) {
+            console.error('Erro ao editar a despesa', err);
+            return res.status(500).json({ error: 'Erro ao editar a despesa' });
+        }
+
+        res.status(200).json({ message: 'Despesa editada com sucesso', results })
+    })
+
+}
+
 const deleteDespesa = (req, res) => {
     const casal = req.header('auth');
     const id = req.header('id');
+    const fixa = req.header('fixa');
 
-    DespesaModel.deleteDespesa(casal, id, (err, results) => {
+    DespesaModel.deleteDespesa(casal, id, fixa, (err, results) => {
         if (err) {
             console.error('Erro ao excluir despesa:', err);
             return res.status(500).json({ error: 'Erro ao excluir despesa' });
@@ -73,8 +93,9 @@ const deleteDespesa = (req, res) => {
 const efetivaDespesa = (req, res) => {
     const casal = req.header('auth');
     const despesaId = req.header('id');
+    const fixa = req.header('fixa');
 
-    DespesaModel.efetivaDespesa(casal, despesaId, (err, results) => {
+    DespesaModel.efetivaDespesa(casal, despesaId, fixa, (err, results) => {
         if (err) {
             console.error(`Erro ao efetivar despesa: ${err}`);
             return res.status(500).json({ error: 'Erro ao efetivar despesa' });
@@ -84,4 +105,4 @@ const efetivaDespesa = (req, res) => {
 }
 
 
-export default { addDespesa, readDespesa, deleteDespesa, readDespesaID, editDespesa, efetivaDespesa }
+export default { addDespesa, readDespesa, deleteDespesa, readDespesaID, editDespesa, editDespesaFixa, efetivaDespesa}
