@@ -4,6 +4,8 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import { host, user, password, database } from './dbConfig.mjs';
 
+import enviaWhats from './data/enviaWhats/enviaWhats.mjs';
+
 const app = express();
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -29,6 +31,7 @@ pool.getConnection((err, conn) => {
     console.log(`Não foi possível abri o pool de conexões`);
   }
   console.log(`Conexão estabelecida via Pool`);
+  //enviaWhats('+554396622714', 'O Servidor do APP DosDois acaba de ser reiniciado');
 
   setTimeout(() => {
     pool.releaseConnection(conn)

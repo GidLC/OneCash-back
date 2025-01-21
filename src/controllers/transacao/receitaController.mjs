@@ -1,7 +1,7 @@
 import ReceitaModel from "../../models/transacoes/receitaModel.mjs";
 
 const addReceita = (req, res) => {
-  const { descricao, valor, categoria, status, data, banco, tipo } = req.body;
+  const { descricao, valor, categoria, status, data, banco, tipo, fixa } = req.body;
   const cod_casal = req.header('auth');
   const usuario = req.header('usuario')
   ReceitaModel.addReceita(descricao, valor, usuario, cod_casal, categoria, status, data, banco, tipo, (err, resultado) => {

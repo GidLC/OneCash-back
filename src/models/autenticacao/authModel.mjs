@@ -226,7 +226,7 @@ class AuthModel {
       })
 
       //registra login do usuário
-      const queryDataLogin = 'UPDATE usuario SET ultimo_acesso = ? WHERE id = ?';
+      /*const queryDataLogin = 'UPDATE usuario SET ultimo_acesso = ? WHERE id = ?';
       await new Promise((resolve, reject) => {
         pool.query(queryDataLogin, [hoje, login[0].id], (err, results) => {
           if (err) {
@@ -235,7 +235,7 @@ class AuthModel {
             resolve(results)
           }
         })
-      })
+      })*/
 
       if (casal[0].usuario_sec !== null) {
         if (login[0].id == casal[0].usuario_princ) {

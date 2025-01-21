@@ -3,15 +3,19 @@ import SeparaData from "../../data/SeparaData/SeparaData.mjs";
 
 class ReceitaModel {
 
-    static addReceita = async (descricao, valor, usuario, cod_casal, categoria, status, data, banco, tipo, callback) => {
-        const query = 'INSERT INTO receita (descricao, valor, usuario, casal, categoria, status, dia, mes, ano, banco, tipo) VALUES (?,?,?,?,?,?,?,?,?,?,?)';
-        const objData = await SeparaData(data)
-        pool.query(query, [descricao, valor, usuario, cod_casal, categoria, status, objData.dia, objData.mes, objData.ano, banco, tipo], (err, results) => {
-            if (err) {
-                return callback(err, null)
-            }
-            return callback(null, results)
-        })
+    static addReceita = async (descricao, valor, usuario, cod_casal, categoria, status, data, banco, tipo, fixa, callback) => {
+        try {
+            const query = 'INSERT INTO receita (descricao, valor, usuario, casal, categoria, status, dia, mes, ano, banco, tipo) VALUES (?,?,?,?,?,?,?,?,?,?,?)';
+            const objData = await SeparaData(data)
+            pool.query(query, [descricao, valor, usuario, cod_casal, categoria, status, objData.dia, objData.mes, objData.ano, banco, tipo], (err, results) => {
+                if (err) {
+                    return callback(err, null)
+                }
+                return callback(null, results)
+            })
+        } catch (error) {
+
+        }
     }
 
     static readReceita = async (usuario, casal, mes, ano, callback) => {
@@ -51,7 +55,7 @@ class ReceitaModel {
         })
 
         const receitas = [...receitasInd, ...receitasCol]
-        return callback (null, receitas)
+        return callback(null, receitas)
     }
 
     static readReceitaID = async (id, usuario, casal, callback) => {

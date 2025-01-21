@@ -12,18 +12,18 @@ import saldosRouter from './routes/saldos/saldosRoutes.mjs';
 import transfRouter from './routes/transacao/transferenciaRoutes.mjs';
 import objetivoRouter from './routes/objetivos/objetivosRoutes.mjs';
 
-app.use('/api/auth', authRouter);
-app.use('/api/receita', receitaRouter);
-app.use('/api/despesa', despesaRouter);
-app.use('/api/compra', compraRouter);
-app.use('/api/banco', bancoRouter);
-app.use('/api/categoriaTr', CategoriaTrRouter);
-app.use('/api/front', frontRouter);
-app.use('/api/graph', graficosRouter);
-app.use('/api/email', enviaEmailRouter);
-app.use('/api/saldos', saldosRouter);
-app.use('/api/transf', transfRouter);
-app.use('/api/objetivos', objetivoRouter);
+app.use('/apiDDv1/auth', authRouter);
+app.use('/apiDDv1/receita', receitaRouter);
+app.use('/apiDDv1/despesa', despesaRouter);
+app.use('/apiDDv1/compra', compraRouter);
+app.use('/apiDDv1/banco', bancoRouter);
+app.use('/apiDDv1/categoriaTr', CategoriaTrRouter);
+app.use('/apiDDv1/front', frontRouter);
+app.use('/apiDDv1/graph', graficosRouter);
+app.use('/apiDDv1/email', enviaEmailRouter);
+app.use('/apiDDv1/saldos', saldosRouter);
+app.use('/apiDDv1/transf', transfRouter);
+app.use('/apiDDv1/objetivos', objetivoRouter);
 
 const PORT = process.env.PORT || 3000;
 
