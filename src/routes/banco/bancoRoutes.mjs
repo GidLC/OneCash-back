@@ -8,5 +8,6 @@ bancoRouter.get('/readBancoID', bancoController.readBancoID)
 bancoRouter.get('/saldoBanco', bancoController.saldoBanco)
 bancoRouter.put('/altSaldoInicial', bancoController.alteraSaldoInicial)
 bancoRouter.put('/arqDesBanco', bancoController.arqDesBanco)
+bancoRouter.put('/editBanco', bancoController.editBanco)
 
 export default bancoRouter

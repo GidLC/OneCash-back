@@ -218,6 +218,7 @@ class SaldosModel {
                         });
                     });
 
+                    //Incrementa o saldo do banco mes a mes
                     receitasBD.forEach(({ total, mes }) => {
                         saldoMensal[mes] += total;
                     });
@@ -265,6 +266,7 @@ class SaldosModel {
                         saldoMensal[mes] += total;
                     });
 
+                    console.log({bancoId, saldoInicial, receitasBD, despesasBD, transfCredBD, transfDebBD})
                     return {bancoId, saldoInicial, receitasBD, despesasBD, transfCredBD, transfDebBD}
                 }));
 

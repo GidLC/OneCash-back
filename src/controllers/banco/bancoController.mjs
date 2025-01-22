@@ -89,4 +89,20 @@ const arqDesBanco = (req, res) => {
     })
 }
 
-export default { addBanco, readBanco, readBancoID, saldoBanco, alteraSaldoInicial, arqDesBanco}
+const editBanco = (req, res) => {
+    const casal = req.header('auth');
+    const id = req.header('id');
+    const nome = req.header('nome');
+    const tipo = req.header('tipo');
+    const usuario = req.header('usuario');
+
+    BancoModel.editBanco(id, casal, nome, tipo, usuario, (err, results) => {
+        if (err) {
+            return res.status(500).json({error: 'Não foi possível realizar essa edição'});
+        }
+
+        res.status(200).json({ message: 'Edição realizada com sucesso', results});
+    });
+}
+
+export default { addBanco, readBanco, readBancoID, saldoBanco, alteraSaldoInicial, arqDesBanco, editBanco}

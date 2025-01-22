@@ -250,17 +250,17 @@ class AuthModel {
               }
             })
           });
-          //console.log(parceiro[0].nome)
   
           return callback(null, {
             id: login[0].id,
             nome: login[0].nome,
             email: login[0].email,
             fone: login[0].fone,
-            email_parceiro: login[0].email_parceiro,
             cod_casal: casal[0].cod_casal,
             id_parceiro: id_parceiro,
-            nome_parceiro: parceiro[0].nome
+            nome_parceiro: parceiro[0].nome,
+            email_parceiro: login[0].email_parceiro,
+            fone_parceiro: parceiro[0].fone,
           })
         } else {
           const id_parceiro = casal[0].usuario_princ
@@ -274,16 +274,16 @@ class AuthModel {
               }
             })
           });
-  
           return callback(null, {
             id: login[0].id,
             nome: login[0].nome,
             email: login[0].email,
             fone: login[0].fone,
-            email_parceiro: login[0].email_parceiro,
             cod_casal: casal[0].cod_casal,
             id_parceiro: id_parceiro,
-            nome_parceiro: parceiro[0].nome
+            nome_parceiro: parceiro[0].nome,
+            email_parceiro: login[0].email_parceiro,
+            fone_parceiro: parceiro[0].fone
           })
         }
       } else {

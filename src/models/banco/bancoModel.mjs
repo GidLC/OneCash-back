@@ -41,7 +41,7 @@ class BancoModel {
             //bancos coletivos
             const queryBancoCol = 'SELECT id, nome, tipo, saldo_inicial FROM banco where casal = ? AND tipo = 1 AND arquivo = ?';
             const bancosCol = await new Promise((resolve, reject) => {
-                pool.query(queryBancoCol, [cod_casal,  arquivo], (err, results) => {
+                pool.query(queryBancoCol, [cod_casal, arquivo], (err, results) => {
                     if (err) {
                         reject(err)
                     }
@@ -284,6 +284,21 @@ class BancoModel {
     }
 
     //Criar função para editar banco
+    static editBanco = async (id, casal, nome, tipo, usuario, callback) => {
+        try {
+            const query = 'UPDATE banco SET nome = ?, tipo = ?, usuario = ? WHERE id = ? AND casal = ?';
+            pool.query(query, [nome, tipo, usuario, id, casal], (err, results) => {
+                if (err) {
+                    return callback(err, null);
+                }
+
+                return callback(null, results);
+            })
+        } catch (error) {
+            console.error(`Não foi possível realizar essa alteração: ${error}`);
+            return callback(error, null);
+        }
+    }
 }
 
 export default BancoModel
