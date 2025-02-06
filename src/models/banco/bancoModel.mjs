@@ -3,7 +3,7 @@ import { pool } from "../../config.mjs";
 class BancoModel {
     static addBanco = (saldo_inicial, casal, nome, tipo, usuario, callback) => {
         if (tipo == 0) {
-            const query = 'INSERT INTO banco (nome, tipo, saldo_inicial, casal, usuario) VALUES (?,?,?,?,?)';
+            const query = 'INSERT INTO banco (nome, tipo, saldo_inicial, casal, usuario, arquivo) VALUES (?,?,?,?,?,?)';
             pool.query(query, [nome, tipo, saldo_inicial, casal, usuario], (err, results) => {
                 if (err) {
                     return callback(err, null)
@@ -12,7 +12,7 @@ class BancoModel {
                 return callback(null, results)
             })
         } else {
-            const query = 'INSERT INTO banco (nome, tipo, saldo_inicial, casal) VALUES (?,?,?,?)';
+            const query = 'INSERT INTO banco (nome, tipo, saldo_inicial, casal, arquivo) VALUES (?,?,?,?,?)';
             pool.query(query, [nome, tipo, saldo_inicial, casal], (err, results) => {
                 if (err) {
                     return callback(err, null)
@@ -27,7 +27,7 @@ class BancoModel {
     static readBanco = async (cod_casal, usuario, arquivo, callback) => {
         try {
             //bancos individuais
-            const queryBancoInd = 'SELECT id, nome, tipo, saldo_inicial FROM banco where casal = ? AND usuario = ? AND tipo = 0 AND arquivo = ?';
+            const queryBancoInd = 'SELECT id, nome, tipo, saldo_inicial, arquivo FROM banco where casal = ? AND usuario = ? AND tipo = 0 AND arquivo = ?';
             const bancosInd = await new Promise((resolve, reject) => {
                 pool.query(queryBancoInd, [cod_casal, usuario, arquivo], (err, results) => {
                     if (err) {
@@ -39,7 +39,7 @@ class BancoModel {
             });
 
             //bancos coletivos
-            const queryBancoCol = 'SELECT id, nome, tipo, saldo_inicial FROM banco where casal = ? AND tipo = 1 AND arquivo = ?';
+            const queryBancoCol = 'SELECT id, nome, tipo, saldo_inicial, arquivo FROM banco where casal = ? AND tipo = 1 AND arquivo = ?';
             const bancosCol = await new Promise((resolve, reject) => {
                 pool.query(queryBancoCol, [cod_casal, arquivo], (err, results) => {
                     if (err) {
@@ -60,7 +60,7 @@ class BancoModel {
     }
 
     static readBancoID = (cod_casal, id, callback) => {
-        const query = `SELECT id, nome, tipo, saldo_inicial FROM banco WHERE casal = ? AND id = ?`;
+        const query = `SELECT id, nome, tipo, saldo_inicial, arquivo FROM banco WHERE casal = ? AND id = ?`;
         pool.query(query, [cod_casal, id], (err, results) => {
             if (err) {
                 return callback(err, null)
