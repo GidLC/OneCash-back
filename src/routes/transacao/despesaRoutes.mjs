@@ -9,5 +9,6 @@ despesaRouter.delete('/deleteDespesa', despesaController.deleteDespesa);
 despesaRouter.put('/editDespesa', despesaController.editDespesa);
 despesaRouter.put('/editDespesaFixa', despesaController.editDespesaFixa);
 despesaRouter.put('/efetivaDespesa', despesaController.efetivaDespesa);
+despesaRouter.delete('/deleteDesPend', despesaController.deleteDespesaPend);
 
 export default despesaRouter;
