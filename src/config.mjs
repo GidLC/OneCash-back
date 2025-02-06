@@ -31,7 +31,7 @@ pool.getConnection((err, conn) => {
     console.log(`Não foi possível abri o pool de conexões`);
   }
   console.log(`Conexão estabelecida via Pool`);
-  //enviaWhats('+554396622714', 'O Servidor do APP DosDois acaba de ser reiniciado');
+  enviaWhats('+554396622714', 'O Servidor do APP DosDois acaba de ser reiniciado');
 
   setTimeout(() => {
     pool.releaseConnection(conn)
