@@ -24,8 +24,7 @@ class DespesaModel {
                 const query = 'INSERT INTO despesas_fixas(id_fixo, descricao, valor, tipo, status, dia, mes, ano, data_criacao, casal, usuario, banco, categoria) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)';
                 const promisses = [];
 
-                for (let ano = objData.ano; ano < objData.ano + 5; ano++) {
-                    console.log({ ano, anoAtual })
+                for (let ano = objData.ano; ano < objData.ano + 30; ano++) {
                     const mesInicial = (ano == anoAtual) ? objData.mes : 0;
                     //Cadastro da despesa nos meses do ano atual
                     for (let mes = mesInicial; mes < 12; mes++) {
@@ -117,6 +116,7 @@ class DespesaModel {
 
     //Através dessa edição só é possível editar uma despesa fixa
     static editDespesa = async (casal, id, descricao, categoria, valor, data, tipo, status, fixa, callback) => {
+        console.log(fixa)
         const tabela = (fixa == 0 || !fixa) ? 'despesa' : 'despesas_fixas';
         const query = `UPDATE ${tabela} SET descricao = ?, categoria = ?, valor =?, dia = ?, mes = ?, ano = ?, tipo = ?, status = ? WHERE casal = ? AND id = ?`
         const objData = await SeparaData(data)
@@ -152,6 +152,18 @@ class DespesaModel {
         pool.query(query, [casal, id], (err, results) => {
             if (err) {
                 return callback(err, null)
+            }
+
+            return callback(null, results)
+        })
+    }
+
+    static deleteDespesaPend = async (casal, id_fixo, callback) => {
+        const query = `DELETE FROM despesas_fixas WHERE casal = ? AND id_fixo = ? AND status = 0`;
+
+        pool.query(query, [casal, id_fixo], (err, results) => {
+            if (err) {
+                return callback(err, null);
             }
 
             return callback(null, results)

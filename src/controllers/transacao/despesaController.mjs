@@ -47,8 +47,7 @@ const readDespesaID = (req, res) => {
 
 const editDespesa = (req, res) => {
     const casal = req.header('auth');
-    const fixa = req.header('fixa');
-    const { id, descricao, categoria, valor, data, tipo, status } = req.body
+    const { id, descricao, categoria, valor, data, tipo, status, fixa } = req.body
 
     DespesaModel.editDespesa(casal, id, descricao, categoria, valor, data, tipo, status, fixa, (err, results) => {
         if (err) {
@@ -71,7 +70,7 @@ const editDespesaFixa = (req, res) => {
             return res.status(500).json({ error: 'Erro ao editar a despesa' });
         }
 
-        res.status(200).json({ message: 'Despesa editada com sucesso', results })
+        res.status(200).json({ message: 'Despesas editadas com sucesso', results })
     })
 
 }
@@ -90,6 +89,19 @@ const deleteDespesa = (req, res) => {
     })
 }
 
+const deleteDespesaPend = (req, res) => {
+    const casal = req.header('auth');
+    const id_fixo = req.header('id_fixo');
+
+    DespesaModel.deleteDespesaPend(casal, id_fixo, (err, results) => {
+        if (err) {
+            return res.status(500).json({error: "Erro ao excluir as receitas"})
+        }
+
+        res.status(200).json({message: 'Despesas excluidas com sucesso', results});
+    })
+}
+
 const efetivaDespesa = (req, res) => {
     const casal = req.header('auth');
     const despesaId = req.header('id');
@@ -105,4 +117,4 @@ const efetivaDespesa = (req, res) => {
 }
 
 
-export default { addDespesa, readDespesa, deleteDespesa, readDespesaID, editDespesa, editDespesaFixa, efetivaDespesa}
+export default { addDespesa, readDespesa, deleteDespesa, readDespesaID, editDespesa, editDespesaFixa, efetivaDespesa, deleteDespesaPend}
