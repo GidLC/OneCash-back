@@ -4,7 +4,7 @@ const addReceita = (req, res) => {
   const { descricao, valor, categoria, status, data, banco, tipo, fixa } = req.body;
   const cod_casal = req.header('auth');
   const usuario = req.header('usuario')
-  ReceitaModel.addReceita(descricao, valor, usuario, cod_casal, categoria, status, data, banco, tipo, (err, resultado) => {
+  ReceitaModel.addReceita(descricao, valor, usuario, cod_casal, categoria, status, data, banco, tipo, fixa, (err, resultado) => {
     if (err) {
       console.error('Erro ao cadastrar receita:', err);
       return res.status(500).json({ message: 'Erro ao cadastrar receita' });
