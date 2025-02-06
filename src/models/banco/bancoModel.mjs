@@ -1,10 +1,10 @@
 import { pool } from "../../config.mjs";
 
 class BancoModel {
-    static addBanco = (saldo_inicial, casal, nome, tipo, usuario, callback) => {
+    static addBanco = (saldo_inicial, casal, nome, tipo, usuario, arquivo, callback) => {
         if (tipo == 0) {
             const query = 'INSERT INTO banco (nome, tipo, saldo_inicial, casal, usuario, arquivo) VALUES (?,?,?,?,?,?)';
-            pool.query(query, [nome, tipo, saldo_inicial, casal, usuario], (err, results) => {
+            pool.query(query, [nome, tipo, saldo_inicial, casal, usuario, arquivo], (err, results) => {
                 if (err) {
                     return callback(err, null)
                 }
@@ -13,7 +13,7 @@ class BancoModel {
             })
         } else {
             const query = 'INSERT INTO banco (nome, tipo, saldo_inicial, casal, arquivo) VALUES (?,?,?,?,?)';
-            pool.query(query, [nome, tipo, saldo_inicial, casal], (err, results) => {
+            pool.query(query, [nome, tipo, saldo_inicial, casal, arquivo], (err, results) => {
                 if (err) {
                     return callback(err, null)
                 }
